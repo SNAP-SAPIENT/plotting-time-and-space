@@ -61,6 +61,9 @@ void setup() {
   penlift_up();
 #endif
 
+  // Enable and lock the motors
+  exec_enable();
+  
   // Indicate that setup is done
   Serial.println("Setup Complete ... ");
 }
