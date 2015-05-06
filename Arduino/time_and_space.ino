@@ -66,6 +66,9 @@ void setup() {
   
   // Indicate that setup is done
   Serial.println("Setup Complete ... ");
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void loop() {

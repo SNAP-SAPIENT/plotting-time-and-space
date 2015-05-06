@@ -39,34 +39,34 @@ void exec_moveline(float x, float y)
   rightMotor.moveTo(newRightPos);
   
   // Now calcuate the ratio between the motor distance to move
-  float moveRatio = (abs(newLeftPos - leftMotor.currentPosition())) / (abs(newRightPos - rightMotor.currentPosition()));
+  float moveRatio = (newLeftPos - leftMotor.currentPosition()) / (newRightPos - rightMotor.currentPosition());
+  // Fix the failure of the abs function
+  if(moveRatio < 0.0) 
+  {
+    moveRatio = (float)0.0 - (float)moveRatio;
+  }
   
   // Set the speeds and ratios accordingly
-  if(moveRatio < 1)
+  if(moveRatio < 1.0)
   {
     leftMotor.setMaxSpeed(motorMaxStepsPerSec * moveRatio);
     rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-    leftMotor.setAcceleration(motorAcceleration * moveRatio);
-    rightMotor.setAcceleration(motorAcceleration);
-    leftMotor.setSpeed(motorMinStepsPerSec * moveRatio);
-    rightMotor.setSpeed(motorMinStepsPerSec);
+    leftMotor.setAcceleration(motorMaxAcceleration * moveRatio);
+    rightMotor.setAcceleration(motorMaxAcceleration);
   }
   else
   {
-    moveRatio = 1.0 / moveRatio;
     leftMotor.setMaxSpeed(motorMaxStepsPerSec);
-    rightMotor.setMaxSpeed(motorMaxStepsPerSec * moveRatio);
-    leftMotor.setAcceleration(motorAcceleration);
-    rightMotor.setAcceleration(motorAcceleration* moveRatio);
-    leftMotor.setSpeed(motorMinStepsPerSec);
-    rightMotor.setSpeed(motorMinStepsPerSec * moveRatio);
+    rightMotor.setMaxSpeed(motorMaxStepsPerSec / moveRatio);
+    leftMotor.setAcceleration(motorMaxAcceleration);
+    rightMotor.setAcceleration(motorMaxAcceleration / moveRatio);
   }
   
   // Run the motors
   while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
   {
-    leftMotor.run();
     rightMotor.run();
+    leftMotor.run();
   }
   
   // Set the new x and y
@@ -95,10 +95,8 @@ void exec_moverapid(float x, float y)
   // Move as fast as possible
   leftMotor.setMaxSpeed(motorMaxStepsPerSec);
   rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-  leftMotor.setSpeed(motorMinStepsPerSec);
-  rightMotor.setSpeed(motorMinStepsPerSec);
-  leftMotor.setAcceleration(motorAcceleration);
-  rightMotor.setAcceleration(motorAcceleration);
+  leftMotor.setAcceleration(motorMaxAcceleration);
+  rightMotor.setAcceleration(motorMaxAcceleration);
 
   // Move the motors to the new positions
   while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
@@ -183,6 +181,9 @@ void exec_disable()
 #ifdef DEBUG
   Serial.println((String)"MOTORS_DISABLED");
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 /*
@@ -201,6 +202,9 @@ void exec_enable()
 #ifdef DEBUG
   Serial.println((String)"MOTORS_ENABLED: left motor = " + leftMotor.currentPosition() + " right motor = " + rightMotor.currentPosition());
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 /*
@@ -211,6 +215,9 @@ void exec_enable()
    // Just change the variable and output the change to serial
    inches = true;
    Serial.println("The system is now working in Inches");
+   
+   // Send that ready for next command
+   Serial.println("READY");
  }
  
  /*
@@ -221,6 +228,9 @@ void exec_set_mm()
    // just change the variable and output the change
    inches = false;
    Serial.println("The system is now working in Milimeters");
+
+   // Send that ready for next command
+   Serial.println("READY");
 }
 
 /*
@@ -231,6 +241,9 @@ void exec_set_relative()
   // Just change the variable and output the change
   relative = true;
   Serial.println("The system is now in relative mode");
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 /*
@@ -241,4 +254,7 @@ void exec_set_absolute()
   // Just change the variable and output the change
   relative = false;
   Serial.println("The system is now in absolute mode");
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }

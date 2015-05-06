@@ -10,18 +10,17 @@
 // Remember that the number of steps per rev depends on the 
 //  step type taken.
 const int motorStepsPerRev = 400;
-const float motorMaxStepsPerSec = 200;
-const float motorMinStepsPerSec = 50;
-const float motorAcceleration = 50;
+const float motorMaxStepsPerSec = 200.0;
+const float motorMaxAcceleration = 200.0;
 const int stepType = INTERLEAVE;
-const float lengthPerStepMM = 5.4;
+const float lengthPerStepMM = 0.4;
  
 // Sizing Information
-const float motorWidthMM = 650.0;
-const float pageWidthMM = 550.0;
-const float pageHeightMM = 550.0;
-const float pageTopPaddingMM = 50.0;
-const float pageLeftPaddingMM = 50.0;
+const float motorWidthMM = 641.35;
+const float pageWidthMM = 457.2;
+const float pageHeightMM = 457.2;
+const float pageTopPaddingMM = 425.45;
+const float pageLeftPaddingMM = 163.5;
  
 // Pen Lift servo information if it exists
 #ifdef PENLIFT
@@ -43,7 +42,7 @@ void forwardR() { rMotor->onestep(FORWARD, stepType); }
 void backwardR() { rMotor->onestep(BACKWARD, stepType); }
  
 AccelStepper leftMotor(forwardL, backwardL);
-AccelStepper rightMotor(forwardR, backwardR); 
+AccelStepper rightMotor(backwardR, forwardR); 
  
 void configuration_setup()
 {
@@ -53,10 +52,8 @@ void configuration_setup()
    // Set the max speeds, min speeds, and acceleration of the motors
    leftMotor.setMaxSpeed(motorMaxStepsPerSec);
    rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-   leftMotor.setAcceleration(motorAcceleration);
-   rightMotor.setAcceleration(motorAcceleration);
-   leftMotor.setSpeed(motorMinStepsPerSec);
-   rightMotor.setSpeed(motorMinStepsPerSec);
+   leftMotor.setAcceleration(motorMaxAcceleration);
+   rightMotor.setAcceleration(motorMaxAcceleration);
    
    // Set the starting position of the motors to be the
    //  top left of the page (0,0) of the coordinate system

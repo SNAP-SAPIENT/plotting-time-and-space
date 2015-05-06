@@ -25,6 +25,9 @@ void penlift_up()
   //  to move to that position
   penlift.write(penliftUpPosition);
   delay(penliftDelay);
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void penlift_down()
@@ -33,6 +36,9 @@ void penlift_down()
   //  to move to that position
   penlift.write(penliftDownPosition);
   delay(penliftDelay);
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void penlift_setAngle(int angle)
@@ -41,5 +47,8 @@ void penlift_setAngle(int angle)
   //  the standard ammount
   penlift.write(angle);
   delay(penliftDelay);
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 #endif

@@ -115,6 +115,9 @@ void comms_moverapid()
 #ifdef DEBUG
   Serial.println((String)"NEW_POSITION: X:" + currentX + " Y:" + currentY);
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_moveline()
@@ -177,6 +180,9 @@ void comms_moveline()
 #ifdef DEBUG
   Serial.println((String)"NEW_POSITION: X:" + currentX + " Y:" + currentY);
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_movearc_clockwise()
@@ -255,6 +261,9 @@ void comms_movearc_clockwise()
 #ifdef DEBUG
   Serial.println((String)"NEW_POSITION: X:" + currentX + " Y:" + currentY);
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_movearc_counterclockwise()
@@ -333,6 +342,9 @@ void comms_movearc_counterclockwise()
 #ifdef DEBUG
   Serial.println((String)"NEW_POSITION: X:" + currentX + " Y:" + currentY);
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_dwell()
@@ -357,6 +369,9 @@ void comms_dwell()
   }
   
   exec_dwell(time);
+  
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_teleport()
@@ -404,10 +419,15 @@ void comms_teleport()
 #ifdef DEBUG
   Serial.println((String)"NEW_POSITION: X:" + currentX + " Y:" + currentY);
 #endif
+
+  // Send that ready for next command
+  Serial.println("READY");
 }
 
 void comms_unrecognized()
 {
   Serial.println("Command unrecognized");
+  // Send that ready for next command
+  Serial.println("READY");
 }
 #endif
