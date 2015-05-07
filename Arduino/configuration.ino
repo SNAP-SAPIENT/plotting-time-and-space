@@ -7,20 +7,18 @@
  */
  
 // Motor Information
-// Remember that the number of steps per rev depends on the 
-//  step type taken.
-const int motorStepsPerRev = 400;
+const int motorStepsPerRev = 200;
 const float motorMaxStepsPerSec = 200.0;
 const float motorMaxAcceleration = 200.0;
 const int stepType = INTERLEAVE;
-const float lengthPerStepMM = 0.4;
+const float lengthPerStepMM = 0.3475;
  
 // Sizing Information
-const float motorWidthMM = 641.35;
-const float pageWidthMM = 457.2;
-const float pageHeightMM = 457.2;
-const float pageTopPaddingMM = 425.45;
-const float pageLeftPaddingMM = 163.5;
+const float motorWidthMM = 700.0;
+const float pageWidthMM = 579.35;
+const float pageHeightMM = 579.35;
+const float pageTopPaddingMM = 228.6;
+const float pageLeftPaddingMM = 60.325;
  
 // Pen Lift servo information if it exists
 #ifdef PENLIFT

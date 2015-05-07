@@ -63,10 +63,21 @@ void exec_moveline(float x, float y)
   }
   
   // Run the motors
-  while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
+  if((x - currentX > 0 && y - currentY < 0) || (x - currentX < 0 && y - currentY > 0))
   {
-    rightMotor.run();
-    leftMotor.run();
+    while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
+    {
+      leftMotor.run();
+      rightMotor.run();
+    }
+  }
+  else
+  {
+    while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
+    {
+      rightMotor.run();
+      leftMotor.run();
+    }
   }
   
   // Set the new x and y

@@ -6,24 +6,21 @@
  *  a penlift mechanisim if the mechanisim is deemed to exist
  */
 #ifdef PENLIFT
-// Include the servo class
-#include <Servo.h>
 
-// Create the servo to use
-Servo penlift;
+// Create the penlift pin
+int penPin = 8;
 
 // Create the setup method
 void penlift_setup()
 {
-  // Attach the servo to the correct pin
-  penlift.attach(penliftServoPin);
+  // Attach the lift to the correct pin
+  pinMode(penPin, OUTPUT);
 }
 
 void penlift_up()
 {
-  // Move to the position and then add a delay for the servo
-  //  to move to that position
-  penlift.write(penliftUpPosition);
+  // Move to the position
+  digitalWrite(penPin, LOW);  
   delay(penliftDelay);
   
   // Send that ready for next command
@@ -32,23 +29,22 @@ void penlift_up()
 
 void penlift_down()
 {
-  // Move to the position and then add a delay for the servo
-  //  to move to that position
-  penlift.write(penliftDownPosition);
+  // Move to the position 
+  digitalWrite(penPin, HIGH);
   delay(penliftDelay);
   
   // Send that ready for next command
   Serial.println("READY");
 }
 
-void penlift_setAngle(int angle)
-{
-  // Set the angle of the pen to the passed angle and delay
-  //  the standard ammount
-  penlift.write(angle);
-  delay(penliftDelay);
-  
-  // Send that ready for next command
-  Serial.println("READY");
-}
+//void penlift_setAngle(int angle)
+//{
+//  // Set the angle of the pen to the passed angle and delay
+//  //  the standard ammount
+//  penlift.write(angle);
+//  delay(penliftDelay);
+//  
+//  // Send that ready for next command
+//  Serial.println("READY");
+//}
 #endif
