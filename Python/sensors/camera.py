@@ -31,7 +31,6 @@ class Camera:
         """
         self.camera.resolution = (2592, 1944)
 
-
     def __del__(self):
         """Close the PiCamera before deleting the object"""
         self.camera.close()
@@ -42,7 +41,7 @@ class Camera:
         it to a picamera array object and return it
         """
         # First create the array to return
-        picture = picamera.array.PiRGBArray(self.camera, size=(width,height))
+        picture = picamera.array.PiYUVArray(self.camera, size=(width,height))
 
         # Now capture the picture
         self.camera.capture(picture, 'yuv', resize=(width,height))

@@ -21,11 +21,11 @@ class Draw:
     FILL_MODE = 1
     LINE_MODE = 2
 
-    __WHITE_VALUE = 0    # Max value that results in no line
+    __WHITE_VALUE = 255    # Max value that results in no line
     __ZIG_ZAG_PER_PIXEL = 6    # Number of zigzags per pixel (Must be even)
 
     def __init__(self, communication, realWidth=500, realHeight=500,
-            pixelWidth=640, pixelHeight=480, pixelMode=0, maxLineDist=20):
+            pixelWidth=640, pixelHeight=480, pixelMode=0, maxLineDist=10):
         """
         Create the initial drawing system with all given info
 
@@ -39,8 +39,8 @@ class Draw:
         """
         # First store the settings
         self.comms = communication
-        self.realWidth = realWidth
-        self.realHeight = realHeight
+        self.realWidth = float(realWidth)
+        self.realHeight = float(realHeight)
         self.pixelWidth = pixelWidth
         self.pixelHeight = pixelHeight
         if pixelMode <= 2 and pixelMode >= 0:
@@ -50,8 +50,8 @@ class Draw:
         self.maxLineDist = maxLineDist
 
         # Calculate pixel size
-        self.pixelSizeWidth = realWidth / pixelWidth
-        self.pixelSizeHeight = realHeight / pixelHeight
+        self.pixelSizeWidth = float(realWidth) / float(pixelWidth)
+        self.pixelSizeHeight = float(realHeight) / float(pixelHeight)
         self.zigZagWidth = (self.pixelSizeWidth /
             (self.__ZIG_ZAG_PER_PIXEL + 2))
 
@@ -108,7 +108,7 @@ class Draw:
             sped - the speed to draw the pixel
             slop - the slope of the pixel
         """
-        if value <= self.__WHITE_VALUE:
+        if value >= self.__WHITE_VALUE:
             # Do not draw anything for white
             return
 
@@ -117,7 +117,7 @@ class Draw:
             2.0)
         centerY = (float(y) * self.pixelSizeHeight) + (self.pixelSizeHeight /
             2.0)
-        zigZagHeight = (self.pixelSizeHeight / 510.0) * value
+        zigZagHeight = (self.pixelSizeHeight / 510.0) * (255.0 - value)
 
         # Turn the slop into rads
         slop = ((2*math.pi) / 11) * slop
@@ -173,7 +173,7 @@ class Draw:
                 (nextY - centerY)*math.cos(slop)) + centerY)
 
             # Move to the point in a line
-            self.comms.moveLine(finalX, finalY)
+            self.moveSmoothLine(finalX, finalY)
 
             # dwell the length of sped in tenths of a second instead of ms
             self.comms.dwell(sped * 100)

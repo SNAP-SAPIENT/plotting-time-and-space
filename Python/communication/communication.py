@@ -68,8 +68,8 @@ class Communication:
         """Moves in a line from the current position to the new position"""
         self._ready()
         # Round the numbers to 3 deciaml places
-        x = round(x, 3)
-        y = round(y, 3)
+        x = round(x, 4)
+        y = round(y, 4)
         self.serial.write("G01 X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
 
@@ -79,10 +79,10 @@ class Communication:
         """
         self._ready()
         # Round the values
-        x = round(x, 3)
-        y = round(y, 3)
-        i = round(i, 3)
-        j = round(j, 3)
+        x = round(x, 4)
+        y = round(y, 4)
+        i = round(i, 4)
+        j = round(j, 4)
         if clockwise:
             self.serial.write("G02 X" + str(x) + " Y" + str(y) + " I" +
                     str(i) + " J" + str(j) + "\r")
@@ -95,8 +95,8 @@ class Communication:
         """Moves from the current position to the new position"""
         self._ready()
         # Round the numbers to 3 deciaml places
-        x = round(x, 3)
-        y = round(y, 3)
+        x = round(x, 4)
+        y = round(y, 4)
         self.serial.write("G00 X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
 
@@ -148,8 +148,8 @@ class Communication:
         """Adjusts the system to believe it is at the new position given"""
         self._ready()
         # Round the x and y
-        x = round(x, 3)
-        y = round(y, 3)
+        x = round(x, 4)
+        y = round(y, 4)
         self.serial.write("TELEPORT X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
 

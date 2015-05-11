@@ -41,3 +41,7 @@ class SwitchSensor:
     def on(self):
         """Return true if switch is high or false if low"""
         return GPIO.input(self.dataPin)
+
+    def off(self):
+        """Return false if switch is high or true if low"""
+        return not GPIO.input(self.dataPin
