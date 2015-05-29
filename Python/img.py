@@ -8,6 +8,7 @@ into an array that is the final image.
 """
 
 import random
+import config
 
 class ProcessedImage:
     """
@@ -23,8 +24,8 @@ class ProcessedImage:
     MODE_GRID = 2
     MODE_WEAVE = 3
 
-    __MAX_PIXEL_SIZE = 30
-    __MIN_PIXEL_SIZE = 5
+    __MAX_PIXEL_SIZE = config.maxPixelSize
+    __MIN_PIXEL_SIZE = config.minPixelSize
 
     def __init__(self, camera, mode=0, complexity=0, spacing=0, threshold=0,
             chunksWide=10, chunksHigh=10, realWidth=500, realHeight=700):

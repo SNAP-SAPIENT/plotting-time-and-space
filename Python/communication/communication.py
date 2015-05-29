@@ -40,10 +40,6 @@ class Communication:
         """Close the serial connection before destructing"""
         self.serial.close()
 
-    def open(self):
-        """Open the communcation line to the arduino"""
-        self.serial.open()
-
     def setPort(self, port):
         """Sets the port of the communication"""
         self.serial.port = port

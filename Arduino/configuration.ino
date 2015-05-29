@@ -11,14 +11,15 @@ const int motorStepsPerRev = 200;
 const float motorMaxStepsPerSec = 200.0;
 const float motorMaxAcceleration = 200.0;
 const int stepType = INTERLEAVE;
-const float lengthPerStepMM = 0.3475;
+const float lengthPerStepMM = 0.3625;
  
 // Sizing Information
-const float motorWidthMM = 700.0;
-const float pageWidthMM = 579.35;
-const float pageHeightMM = 579.35;
-const float pageTopPaddingMM = 228.6;
-const float pageLeftPaddingMM = 60.325;
+// TODO set all of this information in eeprom
+float motorWidthMM = 698.0;
+float pageWidthMM = 579.35;
+float pageHeightMM = 579.35;
+float pageTopPaddingMM = 400;
+float pageLeftPaddingMM = 100;
  
 // Pen Lift servo information if it exists
 #ifdef PENLIFT
@@ -38,6 +39,8 @@ void forwardL() { lMotor->onestep(FORWARD, stepType); }
 void backwardL() { lMotor->onestep(BACKWARD, stepType); }
 void forwardR() { rMotor->onestep(FORWARD, stepType); }
 void backwardR() { rMotor->onestep(BACKWARD, stepType); }
+void leftStep(int dir) { lMotor->onestep(dir, stepType); }
+void rightStep(int dir) { lMotor->onestep(dir, stepType); }
  
 AccelStepper leftMotor(forwardL, backwardL);
 AccelStepper rightMotor(backwardR, forwardR); 
@@ -74,4 +77,44 @@ void configuration_setup()
 #ifdef ETHERNET_COMMS
    comms_ethernet_setup();
 #endif
+}
+
+void conf_set_motor_width()
+{
+  // Adjust the motor width
+  motorWidthMM = atof(SCmd.next());
+  // Send that ready for next command
+  comms_ready();
+}
+
+void conf_set_left_padding()
+{
+  // Adjust the left padding
+  pageLeftPaddingMM = atof(SCmd.next());
+  // Send that ready for next command
+  comms_ready();
+}
+
+void conf_set_top_padding()
+{
+  // Adjust the top padding
+  pageTopPaddingMM = atof(SCmd.next());
+  // Send that ready for next command
+  comms_ready();
+}
+
+void conf_set_canvas_width()
+{
+  // Adjust the canvas width
+  pageWidthMM = atof(SCmd.next());
+  // Send that ready for next command
+  comms_ready();
+}
+
+void conf_set_canvas_height()
+{
+  // Adjust the canvas height
+  pageHeightMM = atof(SCmd.next());
+  // Send that ready for next command
+  comms_ready();
 }

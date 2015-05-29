@@ -20,21 +20,21 @@ void penlift_setup()
 void penlift_up()
 {
   // Move to the position
-  digitalWrite(penPin, LOW);  
+  digitalWrite(penPin, HIGH);  
   delay(penliftDelay);
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void penlift_down()
 {
   // Move to the position 
-  digitalWrite(penPin, HIGH);
+  digitalWrite(penPin, LOW);
   delay(penliftDelay);
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 //void penlift_setAngle(int angle)
@@ -45,6 +45,6 @@ void penlift_down()
 //  delay(penliftDelay);
 //  
 //  // Send that ready for next command
-//  Serial.println("READY");
+//  comms_ready();
 //}
 #endif

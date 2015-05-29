@@ -7,49 +7,33 @@
  *  the future
  */
 #ifdef SERIAL_COMMS
-
-// G code support
-const static char* CMD_RAPIDMOVE = "G00";
-const static char* CMD_NORMALMOVE = "G01";
-const static char* CMD_CLOCKWISE_ARC = "G02";
-const static char* CMD_COUNTERCLOCKWISE_ARC = "G03";
-const static char* CMD_DWELL = "G04";
-const static char* CMD_INCHES = "G20";
-const static char* CMD_MM = "G21";
-const static char* CMD_ABSOLUTE = "G90";
-const static char* CMD_RELATIVE = "G91";
-
-// Special commands non-standard
-const static char* CMD_PENUP = "PENUP";
-const static char* CMD_PENDOWN = "PENDOWN";
-const static char* CMD_TELEPORT = "TELEPORT";
-const static char* CMD_DISABLE = "DISABLE";
-const static char* CMD_ENABLE = "ENABLE";
-
+  
 void comms_serial_setup()
 {
   // Init the serial command tool with all of the known commands
-  SCmd.addCommand(CMD_RAPIDMOVE, comms_moverapid);
-  SCmd.addCommand(CMD_NORMALMOVE, comms_moveline);
-  SCmd.addCommand(CMD_CLOCKWISE_ARC, comms_movearc_clockwise);
-  SCmd.addCommand(CMD_COUNTERCLOCKWISE_ARC, comms_movearc_counterclockwise);
-  SCmd.addCommand(CMD_DWELL, comms_dwell);
-  SCmd.addCommand(CMD_TELEPORT, comms_teleport);
+  SCmd.addCommand("G00", comms_moverapid);
+  SCmd.addCommand("G01", comms_moveline);
+  SCmd.addCommand("G02", comms_movearc_clockwise);
+  SCmd.addCommand("G03", comms_movearc_counterclockwise);
+  SCmd.addCommand("G04", comms_dwell);
+  SCmd.addCommand("TELEPORT", comms_teleport);
+  SCmd.addCommand("G20", exec_set_inches);
+  SCmd.addCommand("G21", exec_set_mm);
+  SCmd.addCommand("G90", exec_set_absolute);
+  SCmd.addCommand("G91", exec_set_relative);
   
 #ifdef PENLIFT  
-  SCmd.addCommand(CMD_PENUP, penlift_up);
-  SCmd.addCommand(CMD_PENDOWN, penlift_down);
+  SCmd.addCommand("PENUP", penlift_up);
+  SCmd.addCommand("PENDOWN", penlift_down);
 #endif
+  SCmd.addCommand("DISABLE", exec_disable);
+  SCmd.addCommand("ENABLE", exec_enable);
 
-  SCmd.addCommand(CMD_INCHES, exec_set_inches);
-  SCmd.addCommand(CMD_MM, exec_set_mm);
-
-// TODO These commands are not recognized due to library
-//  Should use CmdMessenger in the future
-  SCmd.addCommand(CMD_ABSOLUTE, exec_set_absolute);
-  SCmd.addCommand(CMD_RELATIVE, exec_set_relative);
-  SCmd.addCommand(CMD_DISABLE, exec_disable);
-  SCmd.addCommand(CMD_ENABLE, exec_enable);
+  SCmd.addCommand("MWIDTH", conf_set_motor_width);
+  SCmd.addCommand("LPADDING", conf_set_left_padding);
+  SCmd.addCommand("TPADDING", conf_set_top_padding);
+  SCmd.addCommand("CWIDTH", conf_set_canvas_width);
+  SCmd.addCommand("CHEIGHT", conf_set_canvas_height);
 
   // Add the default handler
   SCmd.addDefaultHandler(comms_unrecognized);
@@ -117,7 +101,7 @@ void comms_moverapid()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_moveline()
@@ -182,7 +166,7 @@ void comms_moveline()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_movearc_clockwise()
@@ -263,7 +247,7 @@ void comms_movearc_clockwise()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_movearc_counterclockwise()
@@ -344,7 +328,7 @@ void comms_movearc_counterclockwise()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_dwell()
@@ -371,7 +355,7 @@ void comms_dwell()
   exec_dwell(time);
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_teleport()
@@ -421,13 +405,19 @@ void comms_teleport()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void comms_unrecognized()
 {
-  Serial.println("Command unrecognized");
+  Serial.println(F("Command unrecognized"));
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
+}
+
+void comms_ready()
+{
+  // Make a function because its called often
+  Serial.println(F("READY"));
 }
 #endif

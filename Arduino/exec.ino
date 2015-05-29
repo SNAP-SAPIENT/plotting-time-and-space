@@ -90,6 +90,66 @@ void exec_moveline(float x, float y)
 }
 
 /*
+ * Move the drawing tool to the xy position given in a line
+ * This method uses a different stepping method in an
+ * attempt to keep the line straighter
+ */
+void exec_moveline2(float x, float y)
+{  
+  // Calculate the new positions
+  float newLeftPos = sqrt(sq(pageTopPaddingMM + y) + sq(pageLeftPaddingMM + x)) / lengthPerStepMM;
+  float newRightPos = sqrt(sq(pageTopPaddingMM + y) + sq(motorWidthMM - pageLeftPaddingMM - x)) / lengthPerStepMM;
+  
+  float changeLeft = newLeftPos - leftMotor.currentPosition();
+  float changeRight = newRightPos - rightMotor.currentPosition();
+  
+  // Calculate for bresenham's alg
+  long ad1 = abs(changeLeft);
+  long ad2 = abs(changeRight);
+  int dir1 = changeLeft<0?BACKWARD:FORWARD;
+  int dir2 = changeRight<0?FORWARD:BACKWARD;
+  long over = 0;
+  long i;
+  
+  if(ad1>ad2)
+  {
+    for(i=0;i<ad1;i++)
+    {
+      leftStep(dir1);
+      over += ad2;
+      if(over>ad1)
+      {
+        over -= ad1;
+        rightStep(dir2);
+      }
+      delayMicroseconds(5000);
+    }
+  }
+  else
+  {
+    for(i=0;i<ad2;i++)
+    {
+      rightStep(dir2);
+      over += ad1;
+      if(over >= ad2)
+      {
+        over -= ad2;
+        leftStep(dir1);
+      }
+      delayMicroseconds(5000);
+    }
+  } 
+  
+  // Set the new x and y
+  currentX = x;
+  currentY = y;
+  
+#ifdef DEBUG
+  Serial.println((String)"MOVE_LINE: left motor = " + leftMotor.currentPosition() + " right motor = " + rightMotor.currentPosition());
+#endif
+}
+
+/*
  * Move the drawing tool to the xy position given as quickly
  * as possible
  */
@@ -190,11 +250,11 @@ void exec_disable()
    lMotor->release();
 
 #ifdef DEBUG
-  Serial.println((String)"MOTORS_DISABLED");
+  Serial.println(F("MOTORS_DISABLED"));
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 /*
@@ -215,7 +275,7 @@ void exec_enable()
 #endif
 
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 /*
@@ -225,10 +285,10 @@ void exec_enable()
  {
    // Just change the variable and output the change to serial
    inches = true;
-   Serial.println("The system is now working in Inches");
+   Serial.println(F("The system is now working in Inches"));
    
    // Send that ready for next command
-   Serial.println("READY");
+   comms_ready();
  }
  
  /*
@@ -238,10 +298,10 @@ void exec_set_mm()
 {
    // just change the variable and output the change
    inches = false;
-   Serial.println("The system is now working in Milimeters");
+   Serial.println(F("The system is now working in Milimeters"));
 
    // Send that ready for next command
-   Serial.println("READY");
+   comms_ready();
 }
 
 /*
@@ -251,10 +311,10 @@ void exec_set_relative()
 {
   // Just change the variable and output the change
   relative = true;
-  Serial.println("The system is now in relative mode");
+  Serial.println(F("The system is now in relative mode"));
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 /*
@@ -264,8 +324,8 @@ void exec_set_absolute()
 {
   // Just change the variable and output the change
   relative = false;
-  Serial.println("The system is now in absolute mode");
+  Serial.println(F("The system is now in absolute mode"));
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }

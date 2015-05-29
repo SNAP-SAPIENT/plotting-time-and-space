@@ -37,7 +37,6 @@
 #include <AccelStepper.h>  // Let us move two motors at once
 
 // This would be nice to pull out of here and put in comms but not now
-#include <SoftwareSerial.h>
 #include <SerialCommand.h>
 SerialCommand SCmd;
 
@@ -50,25 +49,25 @@ float currentY = 0.0;
 void setup() {
   // Init the serial stuff
   Serial.begin(57600);
-  Serial.println("Time and Space Plotter ON");
-  Serial.println("-------------------------------");
+  Serial.println(F("Time and Space Plotter ON"));
+  Serial.println(F("-------------------------------"));
 
   // Call the config setup function
   configuration_setup();
 
   // Lift the pen if that function exists
 #ifdef PENLIFT
-  penlift_up();
+  penlift_down();
 #endif
 
   // Enable and lock the motors
   exec_enable();
   
   // Indicate that setup is done
-  Serial.println("Setup Complete ... ");
+  Serial.println(F("Setup Complete ... "));
   
   // Send that ready for next command
-  Serial.println("READY");
+  comms_ready();
 }
 
 void loop() {

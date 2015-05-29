@@ -6,6 +6,7 @@ The main file for plotting time and space. This is a big todo
 """
 
 # Import all of the classes we need
+import config
 from sensors import *
 from communication import *
 import draw as dr
@@ -55,15 +56,63 @@ def error():
     and does not stop until the system is turned off or the reset button
     is used
     """
-    # TODO
+    while True:
+        # Flash leds
+        ledSped.on()
+        ledJttr.on()
+        ledSlop.on()
+        ledThrd.on()
+        ledSpac.on()
+        ledCplx.on()
+        ledModeHorizontal.off()
+        ledModeVertical.off()
+        ledModeGrid.off()
+        ledModeWeave.off()
+
+        time.sleep(0.5)
+
+        ledSped.off()
+        ledJttr.off()
+        ledSlop.off()
+        ledThrd.off()
+        ledSpac.off()
+        ledCplx.off()
+        ledModeHorizontal.on()
+        ledModeVertical.on()
+        ledModeGrid.on()
+        ledModeWeave.on()
+
+        # Check for reset
+        if reset.on():
+            # Break from the loop and the perform the reset function
+            break
+
+    preformReset()
 
 def prefromReset():
     """
     Does a soft reset of the system, bringing all variables to their
     origional state and allows the drawing machine to be recalibrated
     """
-    # TODO
+    # The first thing to do in reset is wait for the person to let go of
+    # the reset button
+    while True:
+        if reset.off():
+            break
+    
+    # Now that the reset button is pressed, let us disable the motors
+    comms.disable()
 
+    # Teleport where we think the motors are
+    comms.teleport(0,0)
+
+    # Now wait until the reset button is pressed again
+    while True:
+        if reset.on():
+            break
+
+    # Now re-enable the motors
+    comms.enable()
 ###############################################################
 # Main Program Function
 ###############################################################
