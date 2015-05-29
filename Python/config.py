@@ -6,15 +6,18 @@ The config file here contains constants and functions that are used fro
 the plotting time and space tool
 """
 
-# Machine Dimensions
+# Machine Dimensions in MM
+motorWidth = 696
 realWidth = 500
 realHeight = 500
+startingX = 0
+startingY = 0
 
-# Max and min pixel sizes
+# Max and min pixel sizes in MM
 maxPixelSize = 30
 minPixelSize = 5
 
-# Drawing params
+# Drawing params in MM
 maxLineDist = 10
 
 # Starting Mode
@@ -24,7 +27,6 @@ startingMode = 0
 #  0 - Consecutive
 #  1 - Random
 modeSwitch = 0
-
 
 # Pixel Shape
 pixelShape = 0

@@ -6,7 +6,7 @@ The Microphone sensor used is a MAX4466
 This is attached to the ADS1015 for communication over I2C
 """
 
-from Adafruit.AdafruitADS1x15 import ADS1x15
+from Adafruit.Adafruit_ADS1x15 import ADS1x15
 
 class MicrophoneSensor:
     """
@@ -38,5 +38,76 @@ class MicrophoneSensor:
 
     def getValue(self):
         """Return the current value of the microphone"""
-        volts = adc.readADCSingleEnded(self.ch, self.gain, self.sps)
-        return (volts / self.gain) * (self.__MAX - self.__MIN) + self.__MIN
+        volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+        return (volts / 3304) * (self.__MAX - self.__MIN) + self.__MIN
+
+    def getRawValue(self):
+        """Returns the current raw value of the microphone"""
+        volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+        return volts
+
+    def getAveragValue(self, samples=20):
+        """Return the average value of the number of samples taken"""
+        total = 0
+        # Take the number of samples
+        for i in range(samples):
+            volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+            total += ((volts / self.gain) * (self.__MAX - self.__MIN) +
+                    self.__MIN)
+
+        # Return the average
+        return total / samples
+
+    def getRawAverageValue(self, samples=20):
+        """Return the raw average value of the number of samples taken"""
+        total = 0
+        # Take the number of samples
+        for i in range(samples):
+            total += self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+
+        # Return the average
+        return total / samples
+
+    def getPeakValues(self, samples=20):
+        """Return the highest and lowest values of the samples taken"""
+        low = self.__MAX
+        high = self.__MIN
+        # Take the number of samples
+        for i in range(samples):
+            volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+            val = (volts / self.gain) * (self.__MAX - self.__MIN) + self.__MIN
+            if val < low:
+                low = val
+            if val > high:
+                high = val
+
+        # Return the results in a tuple
+        return (low, high)
+
+    def getRawPeakValues(self, samples=20):
+        """Return the highest and lowest raw values of the samples taken"""
+        low = self.gain
+        high = 0
+        # Take the number of samples
+        for i in range(samples):
+            volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+            if volts < low:
+                low = volts
+            if volts > high:
+                high = volts
+
+        # Return the results in a tuple
+        return (low, high)
+
+    def getDistPeakValue(self, samples=20):
+        """Get the difference between the peak values of the samples taken"""
+        low, high = self.getPeakValues(samples)
+        return high - low
+
+    def getRawDistPeakValue(self, samples=20):
+        """
+        Get the difference between the raw peak values of the samples
+        taken
+        """
+        low, high = self.getRawPeakValues(samples)
+        return high - low

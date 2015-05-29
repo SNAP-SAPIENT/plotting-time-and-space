@@ -48,8 +48,19 @@ class HumidityAndTemperatureSensor:
                 continue
             else:
                 # Adjust the humidity and temp
-                humidity = (humidity / 100.0) * (self.__MAX - self.__MIN)
-                    + self.__MIN
-                temp = ((temp + 40.0) / 120.0) * (self.__MAX - self.__MIN)
-                    + self.__MIN
+                humidity = ((humidity / 100.0) * (self.__MAX - self.__MIN)
+                    + self.__MIN)
+                temp = (((temp + 40.0) / 120.0) * (self.__MAX - self.__MIN)
+                    + self.__MIN)
                 return (humidity,temp)
+
+    def getRawValues(self):
+        """ Get the raw values of humidty and temperature"""
+        while True:
+            humidity, temp = Adafruit_DHT.read(self.DHT_TYPE, self.dataPin)
+            # Check if it worked
+            if humidity is None or temp is None:
+                time.sleep(self.sleepTime)
+                continue
+            else:
+                return (humidity, temp)

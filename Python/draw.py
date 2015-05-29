@@ -77,7 +77,7 @@ class Draw:
         self.pixelWidth = pixelWidth
         self.pixelHeight = pixelHeight
 
-    def pixel(self, value, x, y, jttr=0, sped=0, slop=0):
+    def pixel(self, value, x, y, jttr=0, slop=0, speed=100):
         """
         Draws the greyscale value as a pixel.
 
@@ -86,17 +86,21 @@ class Draw:
             x - the x value of the pixel
             y - the y value of the pixel
             jttr - the jitter of the pixel
-            sped - the speed to draw the pixel
             slop - the angle to draw the pixel
+            speed - adjustment of time between peaks to draw better
         """
-        if self.pixelMode == self.ZIGZAG_MODE:
-            self._drawZigZag(value, x, y, jttr, sped, slop)
-        if self.pixelMode == self.FILL_MODE:
-            self._drawFill(value, x, y, jttr, sped, slop)
-        if self.pixelMode == self.LINE_MODE:
-            self._drawLine(value, x, y, jttr, sped, slop)
+        # Adjust x and y to keep in the bounds
+        x = max(0, min(self.pixelWidth, x))
+        y = max(0, min(self.pixelHeight, y))
 
-    def _drawZigZag(self, value, x, y, jttr, sped, slop):
+        if self.pixelMode == self.ZIGZAG_MODE:
+            self._drawZigZag(value, x, y, jttr, slop, speed)
+        if self.pixelMode == self.FILL_MODE:
+            self._drawFill(value, x, y, jttr, slop, speed)
+        if self.pixelMode == self.LINE_MODE:
+            self._drawLine(value, x, y, jttr, slop, speed)
+
+    def _drawZigZag(self, value, x, y, jttr, slop, speed):
         """
         Draws the greyscale value as a pixel using a zigzag
 
@@ -140,7 +144,8 @@ class Draw:
         sY = (((startX - centerX)*math.sin(slop) +
                 (startY - centerY)*math.cos(slop)) + centerY)
 
-        if self.currentPos != (sX, sY):
+        if (round(self.currentPos[0], 3) != round(sX, 3) or
+            round(self.currentPos[1], 3) != round(sY, 3)):
             # Move to the current position
             self.comms.penUp()
             # Move in chunks if the line is too long
@@ -176,7 +181,7 @@ class Draw:
             self.moveSmoothLine(finalX, finalY)
 
             # dwell the length of sped in tenths of a second instead of ms
-            self.comms.dwell(sped * 100)
+            self.comms.dwell(speed)
 
         # Now go to the end pixel
         self.moveSmoothLine(eX, eY)

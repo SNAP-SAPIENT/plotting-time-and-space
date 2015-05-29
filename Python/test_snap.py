@@ -9,26 +9,24 @@ from communication import communication
 import draw
 from PIL import Image
 import numpy
-import sys
 
 def main():
-    fn = 'Barry_4greys.png'
-    if len(sys.argv) > 1:
-        fn = sys.argv[1]
-
     # Open the image
-    pic = Image.open(fn).convert('L')
+    pic = Image.open('SNAP.png').convert('L')
 
     # Convert it to a numpy array
     pix = numpy.array(pic)
 
     # Now create the communication and draw objects
     comms = communication.Communication()
-    dr = draw.Draw(comms, realWidth=498, realHeight=498,
-            pixelWidth=pix.shape[1], pixelHeight=pix.shape[0])
+    dr = draw.Draw(comms, realWidth = 498, realHeight = 498,
+            pixelWidth = pix.shape[1], pixelHeight = pix.shape[0])
 
     for i in range(pix.shape[0]):
         for j in range(pix.shape[1]):
-            dr.pixel(pix[i][j], j, i, slop=0)
+            if pix[i][j] == 198:
+                dr.pixel(225, j, i, slop=0)
+            else:
+                dr.pixel(pix[i][j], j, i, slop=0)
 
 if __name__ == '__main__': main()

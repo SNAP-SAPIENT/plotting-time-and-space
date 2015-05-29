@@ -19,9 +19,6 @@ class Camera:
     raw image will be converted into a numpy array
     """
 
-    # Global Variables
-    camera = picamera.PiCamera()
-
     def __init__(self):
         """
         Create the object to talk to the camera and work with it
@@ -29,6 +26,7 @@ class Camera:
         Keyword arguments:
             mode - the color mode to capture
         """
+        self.camera = picamera.PiCamera()
         self.camera.resolution = (2592, 1944)
 
     def __del__(self):

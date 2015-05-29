@@ -6,7 +6,7 @@ The Light sensor being used is the TSL2561
 Communication is done through I2C
 """
 
-from Adafruit.TSL2561 import TSL2561 
+from Adafruit import TSL2561
 
 class LightSensor:
     """
@@ -27,7 +27,7 @@ class LightSensor:
             addr - the I2C address of the TSL2561
             gain - the gain of the signal
         """
-        self.tsl = TSL2561(addr)
+        self.tsl = TSL2561.Luxmeter(addr)
         self.gain = gain
 
     def getValue(self):

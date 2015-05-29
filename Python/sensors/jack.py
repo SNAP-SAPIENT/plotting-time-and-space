@@ -1,18 +1,18 @@
 """
-Switch Sensor
+Jack Sensor
 Author: Robert Ross
 
-The Switch sensors detect a high or low value depending on the sensor
+The Jack sensors detect a high or low value depending on the sensor
 """
 
 import RPi.GPIO as GPIO
 
-class SwitchSensor:
+class JackSensor:
     """
-    Handles the grabbing of data from a switch through GPIO
+    Handles the grabbing of data from a jack through GPIO
 
-    A high value detected on the switch will return true
-    and a low value detected on the switch will return false
+    A high value detected on the jack will return true
+    and a low value detected on the jack will return false
     """
 
     # Global Static Variables
@@ -21,7 +21,7 @@ class SwitchSensor:
 
     def __init__(self, dataPin=4):
         """
-        Create the object to talk to the switch
+        Create the object to talk to the jack
 
         Keyword arguments:
             dataPin - the pin that is used to detect a high or low voltage
@@ -32,16 +32,16 @@ class SwitchSensor:
         GPIO.setup(self.dataPin, GPIO.IN)
 
     def getValue(self):
-        """Return max if switch is high or min if low"""
+        """Return max if jack is high or min if low"""
         if GPIO.input(self.dataPin):
             return self.__MAX
         else:
             return self.__MIN
 
     def on(self):
-        """Return true if switch is high or false if low"""
+        """Return true if jack is high or false if low"""
         return GPIO.input(self.dataPin)
 
     def off(self):
-        """Return false if switch is high or true if low"""
+        """Return false if jack is high or true if low"""
         return not GPIO.input(self.dataPin)

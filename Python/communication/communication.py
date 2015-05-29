@@ -149,6 +149,36 @@ class Communication:
         self.serial.write("TELEPORT X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
 
+    def setMotorWidth(self, width):
+        """Tells the system the motor width"""
+        self._ready()
+        self.serial.write("MWIDTH " + str(width) + "\r")
+        self.serial.flush()
+
+    def setLeftPadding(self, padding):
+        """Tells the system the left padding"""
+        self._ready()
+        self.serial.write("LPADDING " + str(padding) + "\r")
+        self.serial.flush()
+
+    def setTopPadding(self, padding):
+        """Tells the system the top padding"""
+        self._ready()
+        self.serial.write("TPADDING " + str(padding) + "\r")
+        self.serial.flush()
+
+    def setRealWidth(self, width):
+        """Tells the system the width of the drawing space"""
+        self._ready()
+        self.serial.write("CWIDTH " + str(width) + "\r")
+        self.serial.flush()
+
+    def setRealHeight(self, height):
+        """Tells the system the height of the drawing space"""
+        self._ready()
+        self.serial.write("CHEIGHT " + str(height) + "\r")
+        self.serial.flush()
+
     def _ready(self):
         """Returns once the serial is ready for the next command"""
         while True:

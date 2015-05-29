@@ -27,9 +27,24 @@ class ProcessedImage:
     __MAX_PIXEL_SIZE = config.maxPixelSize
     __MIN_PIXEL_SIZE = config.minPixelSize
 
-    def __init__(self, camera, mode=0, complexity=0, spacing=0, threshold=0,
-            chunksWide=10, chunksHigh=10, realWidth=500, realHeight=700):
-        """TODO"""
+    def __init__(self, camera=None, mode=0, complexity=0, spacing=0,
+            threshold=0, chunksWide=10, chunksHigh=10, realWidth=500,
+            realHeight=700):
+        """
+        Sets up the initial processed image class with the passed
+        info
+
+        Keyword Arguments:
+            camera - The camera to take pictures
+            mode - The starting mode
+            complexity - The complexity
+            spacing - The line spacing (Pixel Density)
+            threshold - The threshold which determines the contrast
+            chunksWide - How many sections wide the image is
+            chunksHigh - How many sections high the image is
+            realWidth - The width of the drawing section in MM
+            realHeight - The height of the drawing section in MM
+        """
         self.mode = mode
         self.complexity = complexity
         self.spacing = spacing
@@ -85,6 +100,11 @@ class ProcessedImage:
         Takes into effect, the current mode, complexity, and spacing
         and fills in the next section of the image array
         """
+        if camera == None:
+            # No camera declared
+            print "Camera is not properly set up"
+            return False
+
         # Set the contrast based on the spacing
         self.camera.setContrast((((self.threshold) *
             (200)) / (11)) -100)
@@ -103,7 +123,7 @@ class ProcessedImage:
             numRows = max(1,numRows)
             for i in range(int(numRows)):
                 # Find the next row of chunks and fill them
-                added = self._addRow(pic, pixWide, pixHigh)
+                added = self._addRow(pic.array, pixWide, pixHigh)
                 if added == False:
                     # Return that a new mode needs to happen
                     return False
@@ -113,7 +133,7 @@ class ProcessedImage:
             numCols = max(1,numCols)
             for i in range(int(numCols)):
                 # Find the next col of chunks and fill them
-                added = self._addCol(pic, pixWide, pixHigh)
+                added = self._addCol(pic.array, pixWide, pixHigh)
                 if added == False:
                     # Return that a new mode needs to happen
                     return False
@@ -124,7 +144,7 @@ class ProcessedImage:
             numChunks = max(1,numChunks)
             for i in range(int(numChunks)):
                 # Find the next random open chunk and fill it
-                added = self._addChunk(pic, pixWide, pixHigh)
+                added = self._addChunk(pic.array, pixWide, pixHigh)
                 if added == False:
                     # Return that a new mode needs to happen
                     return False
@@ -135,7 +155,7 @@ class ProcessedImage:
             numSwitch = max(1,numSwitch)
             for i in range(int(numSwitch)):
                 # Find the next col or row to fill and fill them
-                added = self._addWeave(pic, pixWide, pixHigh)
+                added = self._addWeave(pic.array, pixWide, pixHigh)
                 if added == False:
                     # Return that a new mode needs to happen
                     return False
@@ -168,7 +188,7 @@ class ProcessedImage:
                 top = self.lastWritten * pixPerChunkHigh
                 bottom = top + pixPerChunkHigh
                 self.img[self.lastWritten][i].fillChunk(
-                        pic.array[top:bottom,left:right,0])
+                        pic[top:bottom,left:right,0])
 
         # Return that finished successfully
         return True
@@ -200,7 +220,7 @@ class ProcessedImage:
                 top = i * pixPerChunkHigh
                 bottom = top + pixPerChunkHigh
                 self.img[i][self.lastWritten].fillChunk(
-                        pic.array[top:bottom,left:right,0])
+                        pic[top:bottom,left:right,0])
 
         # Return that finished successfully
         return True
@@ -245,8 +265,8 @@ class ProcessedImage:
 
         filled = True
         # Check to see if there is any unfilled chunks
-        for i in self.chunksHigh:
-            for j in self.chunksWide:
+        for i in range(self.chunksHigh):
+            for j in range(self.chunksWide):
                 if self.img[i][j].filled == False:
                     filled = False
                     break
@@ -268,7 +288,7 @@ class ProcessedImage:
         bottom = top + pixPerChunkHigh
         left = j * pixPerChunkWide
         right = left + pixPerChunkWide
-        self.img[i][j].fillChunk(pic.array[top:bottom,left:right,0])
+        self.img[i][j].fillChunk(pic[top:bottom,left:right,0])
 
         # Now return that a chunk was drawn
         return True

@@ -6,7 +6,7 @@ The Potentiometer sensors are hooked up through the ADS1015 to convert the
 analog signal to an I2C input
 """
 
-from Adafruit.AdafruitADS1x15 import ADS1x15
+from Adafruit.Adafruit_ADS1x15 import ADS1x15
 
 class PotentiometerSensor:
     """
@@ -38,6 +38,11 @@ class PotentiometerSensor:
 
     def getValue(self):
         """Return the current value of the potentiometer"""
-        volts = adc.readADCSingleEnded(self.ch, self.gain, self.sps)
-        return (volts / self.gain) * (self.__MAX - self.__MIN) + self.__MIN
+        volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+        return (self.__MAX - ((volts -3264.0) / 40.0) * (self.__MAX -
+            self.__MIN))
 
+    def getRawValue(self):
+        """Return the current raw value of the potentiometer"""
+        volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+        return volts
