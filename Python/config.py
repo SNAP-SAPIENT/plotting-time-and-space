@@ -17,6 +17,10 @@ startingY = 0
 maxPixelSize = 30
 minPixelSize = 5
 
+# Max and min time between pictures in seconds
+maxPictureTime = 90
+minPictureTime = 10
+
 # Drawing params in MM
 maxLineDist = 10
 
@@ -35,3 +39,8 @@ pixelShape = 0
 pixelWhiteValue = 255
 # Number of zig zags per pixel if the pixel mode is 0
 zigZagsPerPixel = 4
+
+# Min and Max readings
+MIN = 0
+MAX = 11
+

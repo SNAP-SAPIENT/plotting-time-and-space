@@ -17,11 +17,12 @@ class MicrophoneSensor:
     """
 
     # Static Class Variables
-    __MAX = 11.0
-    __MIN = 1.0
     __ADS1015 = 0x00    # 12-bit ADC
 
-    def __init__(self, addr=0x48, ch=0, gain=4096, sps=250):
+    def __init__(
+            self, addr=0x48, ch=0,
+            gain=4096, sps=250, minVal=0, maxVal=11
+            ):
         """
         Create the object to talk to the MAX4466 microphone sensor
 
@@ -30,11 +31,15 @@ class MicrophoneSensor:
             ch - the input channel of the ADS1015 being used
             gain - the gain of the signal
             sps - the samples per second
+            minVal - the minimum value that the sensor outputs
+            maxVal - the maximum value that the sensor outputs
         """
         self.gain = gain
         self.sps = sps
         self.ch = ch
         self.adc = ADS1x15(address=addr, ic=self.__ADS1015)
+        self.__MIN = minVal
+        self.__MAX = maxVal
 
     def getValue(self):
         """Return the current value of the microphone"""

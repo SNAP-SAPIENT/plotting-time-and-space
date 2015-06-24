@@ -6,6 +6,8 @@ The main file for plotting time and space. This is a big todo
 """
 
 # Import all of the classes we need
+import time
+
 import config
 from sensors import jack
 from sensors import camera
@@ -19,16 +21,16 @@ from communication import plug
 from communication import communication
 import draw as dr
 import img as im
-import time
+
 
 #################################################################
 # Declerations
 #################################################################
 # Inputs
 cam = camera.Camera()
-#light = light.LightSensor(addr=0x39)
 humidAndTemp = humidity_and_temperature.HumidityAndTemperatureSensor()
 mic = microphone.MicrophoneSensor(addr=0x4A, ch=3)
+lux = light.LightSensor(addr=0x39, gain=0)  # Autogain mode
 reset = switch.SwitchSensor(dataPin=26)
 
 # Drawing Attributes
@@ -69,6 +71,7 @@ jackCplx = jack.JackSensor(dataPin=11)
 comms = communication.Communication()
 draw = dr.Draw(comms)
 img = im.ProcessedImage(cam)
+
 
 ###############################################################
 # Helper Functions
@@ -113,10 +116,28 @@ def preformReset():
     # Now re-enable the motors
     comms.enable()
 
-def detectPlugs():
+    # Now select the new mode
+    img.changeToNextMode()
+    setModeLight()
+
+def setModeLight():
+    """Cycle through the modes and set the correct mode light on"""
+    # Now select the new mode
+    if img.mode == 0:
+        ledModeHorizontal.on()
+    elif img.mode == 1:
+        ledModeVertical.on()
+    elif img.mode == 2:
+        ledModeGrid.on()
+    elif img.mode == 3:
+        ledModeWeave.on()
+
+def detectPlugsAndSensors():
     """
     Send signals through each of the plugs to detect where it might
     be plugged in
+    After it finds if something is plugged in, it finds the sensor value
+    and uses that
     """
     # First turn off all of the plugs and led's
     plugLux.off()
@@ -130,99 +151,112 @@ def detectPlugs():
     ledThrd.off()
     ledCplx.off()
 
+    values = {
+            'slop': slop.getValue(), 'spac': spac.getValue(),
+            'sped': sped.getValue(), 'jttr': jttr.getValue(),
+            'thrd': thrd.getValue(), 'cplx': cplx.getValue()
+            }
+
+    # Get the sensor readings
+    h, t = humidAndTemp.getValues()
+    l = lux.getValue()
+    s = mic.getDistPeakValue()
+
     # Now check for the lux
     plugLux.on()
-    l = None
     if jackSlop.on():
         ledSlop.on()
-        l = 'slop'
+        values['slop'] *= l
     elif jackSpac.on():
         ledSpac.on()
-        l = 'spac'
+        values['spac'] *= l
     elif jackSped.on():
         ledSped.on()
-        l = 'sped'
+        values['sped'] *= l
     elif jackJttr.on():
         ledJttr.on()
-        l = 'jttr'
+        values['jttr'] *= l
     elif jackThrd.on():
         ledThrd.on()
-        l = 'thrd'
+        values['thrd'] *= l
     elif jackCplx.on():
         ledCplx.on()
-        l = 'cplx'
+        values['cplx'] *= l
     plugLux.off()
 
     # Now check for the tmp
     plugTmp.on()
-    t = None
     if jackSlop.on():
         ledSlop.on()
-        t = 'slop'
+        values['slop'] *= t
     elif jackSpac.on():
         ledSpac.on()
-        t = 'spac'
+        values['spac'] *= t
     elif jackSped.on():
         ledSped.on()
-        t = 'sped'
+        values['sped'] *= t
     elif jackJttr.on():
         ledJttr.on()
-        t = 'jttr'
+        values['jttr'] *= t
     elif jackThrd.on():
         ledThrd.on()
-        t = 'thrd'
+        values['thrd'] *= t
     elif jackCplx.on():
         ledCplx.on()
-        t = 'cplx'
+        values['cplx'] *= t
     plugTmp.off()
 
     # Now check for the hum
     plugHum.on()
-    h = None
     if jackSlop.on():
         ledSlop.on()
-        h = 'slop'
+        values['slop'] *= h
     elif jackSpac.on():
         ledSpac.on()
-        h = 'spac'
+        values['spac'] *= h
     elif jackSped.on():
         ledSped.on()
-        h = 'sped'
+        values['sped'] *= h
     elif jackJttr.on():
         ledJttr.on()
-        h = 'jttr'
+        values['jttr'] *= h
     elif jackThrd.on():
         ledThrd.on()
-        h = 'thrd'
+        values['thrd'] *= h
     elif jackCplx.on():
         ledCplx.on()
-        h = 'cplx'
+        values['cplx'] *= h
     plugHum.off()
 
     # Now check for the snd
     plugSnd.on()
-    s = None
     if jackSlop.on():
         ledSlop.on()
-        s = 'slop'
+        values['slop'] *= s
     elif jackSpac.on():
         ledSpac.on()
-        s = 'spac'
+        values['spac'] *= s
     elif jackSped.on():
         ledSped.on()
-        s = 'sped'
+        values['sped'] *= s
     elif jackJttr.on():
         ledJttr.on()
-        s = 'jttr'
+        values['jttr'] *= s
     elif jackThrd.on():
         ledThrd.on()
-        s = 'thrd'
+        values['thrd'] *= s
     elif jackCplx.on():
         ledCplx.on()
-        s = 'cplx'
+        values['cplx'] *= s
     plugSnd.off()
 
-    return (('lux', l), ('tmp', t), ('hum', h), ('snd', s))
+    # Limit the values to max
+    for key, value in values.iteritems():
+        if value > config.MAX:
+            value = config.MAX
+
+    return values
+
 
 def error():
     """
@@ -270,7 +304,7 @@ def error():
 ###############################################################
 def main():
     """
-    This function contains the main loop that is run to controll the 
+    This function contains the main loop that is run to controll the
     plotting time and space drawing machine and console.
 
     The loop will go through and handle each input and output
@@ -282,9 +316,66 @@ def main():
             break
 
     # Now set up some things
-    currentChunk = (0, 0)
-    lastPixel = (0, 0)
+    currentChunk = None
+    chunk = None
+    lastPixelInChunk = None
+
+    # Set the initial mode light
+    setModeLight()
 
     # Now we can start drawing in an infinate loop
     try:
         while True:
+            # Detect the plugs that are plugged in
+            plugs = detectPlugsAndSensors()
+
+            # Set the values based on the sensors
+            img.setComplexity = plugs['cplx']
+            img.setSpacing = plugs['spac']
+            img.setThreshold = plugs['thrd']
+            img.setSpeed = plugs['sped']
+            draw.setJitter = plugs['jttr']
+            draw.setSlope = plugs['slop']
+
+            # Now check if a new picture needs to be taken
+            if img.timeForNextImage():
+                added = img.addNextImage()
+
+            # Now find the next pixel to draw
+            # First start at the chunk level
+            if currentChunk is None:
+                # Assign the first chunk
+                if img.chunksAddedOrder is None:
+                    # Wait for an image to be added
+                    continue
+                else:
+                    currentChunk = img.chunksAddedOrder[0]
+                    chunk = img.img[currentChunk[0]][currentChunk[1]]
+            elif lastPixelInChunk is not None:
+                if chunk.pixels.shape == lastPixelInChunk:
+                    # We finished this chunk
+                    chunk.drawChunk()
+                    # Grab the next chunk if there is one
+                    pos = img.chunksAddedOrder.index(currentChunk)
+                    if pos+1 == len(img.chunksAddedOrder):
+                        # Wait for a new picture to be taken
+                        continue
+                    currentChunk = img.chunksAddedOrder[pos+1]
+                    chunk = img.img[currentChunk[0]][currentChunk[1]]
+                    # Reset the pixel position
+                    lastPixelInChunk = None
+
+            # Set the pixel dimensions based on the chunk
+            draw.setPixelDimensions(chunk.pixels.shape[1]*img.chunksWide,
+                    chunk.pixels.shape[0]*img.chunksHigh)
+
+            # Adjust the slope if we are drawing down
+            if img.mode == MODE_VERTICAL:
+                draw.setSlope(draw.slope + ((config.MAX-config.MIN)*0.25))
+            elif img.mode == MODE_WEAVE:
+                # TODO
+            # Find the pixel to draw
+            if lastPixelInChunk is None:
+                lastPixelInChunk = (0,0)
+            else:
+                if lastPixelInChunk[0] == chunk.pixels.shape[0]

@@ -6,9 +6,11 @@ This contains the methods to draw on the machine. The base method is the draw
 pixel method, which draws a basic pixel.
 """
 
-import communication.communication as comms
 import math
 import random
+
+import config
+import communication.communication as comms
 
 class Draw:
     """
@@ -24,18 +26,26 @@ class Draw:
     __WHITE_VALUE = 255    # Max value that results in no line
     __ZIG_ZAG_PER_PIXEL = 6    # Number of zigzags per pixel (Must be even)
 
-    def __init__(self, communication, realWidth=500, realHeight=500,
-            pixelWidth=640, pixelHeight=480, pixelMode=0, maxLineDist=10):
+    def __init__(
+            self, communication, realWidth=500, realHeight=500,
+            pixelWidth=640, pixelHeight=480, pixelMode=0, maxLineDist=10,
+            jitter=0, slope=0, topPadding=400, leftPadding=100, motorWidth=800
+            ):
         """
         Create the initial drawing system with all given info
 
         Keyword arguments:
             realWidth - the width of the drawing surface in mm
             realHeight - the height of the drawing surface in mm
+            topPadding - the top padding of the drawing surface in mm
+            leftPadding - the left padding of the drawing surface in mm
+            motorWidth - the distance the motors are from each other in mm
             pixelWidth - the width of the drawing surface in pixels
             pixelHeight - the height of the drawing surface in piexls
             pixelMode - the pixel drawing mode (how a pixel is drawn)
             communication - the communication object to talk to the motors
+            jitter - the initial jitter of the pixels
+            slope - the initial slope of the pixels
         """
         # First store the settings
         self.comms = communication
@@ -43,6 +53,8 @@ class Draw:
         self.realHeight = float(realHeight)
         self.pixelWidth = pixelWidth
         self.pixelHeight = pixelHeight
+        self.jitter = jitter
+        self.slope = slope
         if pixelMode <= 2 and pixelMode >= 0:
             self.pixelMode = pixelMode
         else:
@@ -61,11 +73,30 @@ class Draw:
         # Set the initial drawing mode to absolute and mm
         self.comms.switchToMM()
         self.comms.switchToAbsolute()
+        # Set the real dimensions and padding in the communications
+        self.comms.setMotorWidth(motorWidth)
+        self.comms.setTopPadding(topPadding)
+        self.comms.setLeftPadding(leftPadding)
+        self.comms.setRealWidth(self.realWidth)
+        self.comms.setRealHeight(self.realHeight)
+
+        # Reset the starting pos due to the padding changes
+        self.comms.teleport(0.0, 0.0)
 
     def setPixelMode(self, mode):
         """Set the pixel drawing mode to the passed mode"""
         if mode <= 2 and mode >= 0:
             self.pixelMode = mode
+
+    def setJitter(self, jitter):
+        """Set the pixel jitter to the passed jitter"""
+        j = min(config.MAX, max(config.MIN, jitter))
+        self.jitter = j
+
+    def setSlope(self, slope):
+        """Set the pixel slope to the passed slope"""
+        s = min(config.MAX, max(config.MIN, slope))
+        self.slope = s
 
     def setRealDimensions(self, realWidth, realHeight):
         """Set the real dimensions of the plotting area"""
@@ -77,7 +108,7 @@ class Draw:
         self.pixelWidth = pixelWidth
         self.pixelHeight = pixelHeight
 
-    def pixel(self, value, x, y, jttr=0, slop=0, speed=100):
+    def pixel(self, value, x, y, jttr=None, slop=None, speed=100):
         """
         Draws the greyscale value as a pixel.
 
@@ -89,6 +120,12 @@ class Draw:
             slop - the angle to draw the pixel
             speed - adjustment of time between peaks to draw better
         """
+        # Set the jitter and slope if not passed
+        if jttr is None:
+            jttr = self.jitter
+        if slop is None:
+            slop = self.slope
+
         # Adjust x and y to keep in the bounds
         x = max(0, min(self.pixelWidth, x))
         y = max(0, min(self.pixelHeight, y))
@@ -124,7 +161,7 @@ class Draw:
         zigZagHeight = (self.pixelSizeHeight / 510.0) * (255.0 - value)
 
         # Turn the slop into rads
-        slop = ((2*math.pi) / 11) * slop
+        slop = ((math.pi/2) / (config.MAX - config.MIN)) * (slop - config.MIN)
 
         # Mark out the start and end place
         startX = float(x) * self.pixelSizeWidth

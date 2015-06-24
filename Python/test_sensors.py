@@ -10,12 +10,12 @@ from sensors.microphone import MicrophoneSensor
 from sensors.humidity_and_temperature import HumidityAndTemperatureSensor
 
 # Create the objects
-slop = PotentiometerSensor(addr=0x48, ch=1, gain=4096, sps=250)
-spac = PotentiometerSensor(addr=0x48, ch=2, gain=4096, sps=250)
-sped = PotentiometerSensor(addr=0x48, ch=3, gain=4096, sps=250)
-jttr = PotentiometerSensor(addr=0x49, ch=0, gain=4096, sps=250)
-trhd = PotentiometerSensor(addr=0x49, ch=1, gain=4096, sps=250)
-cplx = PotentiometerSensor(addr=0x49, ch=2, gain=4096, sps=250)
+slop = PotentiometerSensor(addr=0x48, ch=2, gain=4096, sps=250)
+spac = PotentiometerSensor(addr=0x4A, ch=2, gain=4096, sps=250)
+sped = PotentiometerSensor(addr=0x4A, ch=0, gain=4096, sps=250)
+jttr = PotentiometerSensor(addr=0x4A, ch=1, gain=4096, sps=250)
+trhd = PotentiometerSensor(addr=0x48, ch=1, gain=4096, sps=250)
+cplx = PotentiometerSensor(addr=0x48, ch=3, gain=4096, sps=250)
 
 lux = LightSensor(addr=0x39, gain=0)
 hum_and_tmp = HumidityAndTemperatureSensor(dataPin=4)
@@ -26,8 +26,8 @@ reset = SwitchSensor(dataPin=5)
 def main():
     while True:
         # Go through and check every sensor
-        print "Lux=", lux.getValue
-        humidity, temperature = hum_and_tmp.getValue()
+        print "Lux=", lux.getValue()
+        humidity, temperature = hum_and_tmp.getValues()
         print "Tmp=", temperature
         print "Hum=", humidity
         print "Snd=", snd.getValue()

@@ -16,10 +16,7 @@ class LightSensor:
     over I2C
     """
 
-    __MAX = 11.0
-    __MIN = 1.0
-
-    def __init__(self, addr=0x39, gain=0):
+    def __init__(self, addr=0x39, gain=0, minVal=0, maxVal=11):
         """
         Create the object to talk to the TSL2561
 
@@ -29,6 +26,8 @@ class LightSensor:
         """
         self.tsl = TSL2561.Luxmeter(addr)
         self.gain = gain
+        self.__MIN = minVal
+        self.__MAX = maxVal
 
     def getValue(self):
         """Return the current value of the lux sensor"""

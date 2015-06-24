@@ -22,21 +22,21 @@ class HumidityAndTemperatureSensor:
     and the Humidity value ranges from X to XX
     """
 
-    # Global Static Variables
-    __MIN = 1
-    __MAX = 11
-
-    def __init__(self, dataPin=4, sleepTime=2):
+    def __init__(self, dataPin=4, sleepTime=2, minVal=0, maxVal=11):
         """
         Set up the connection to the DHT22 Sensor
 
         Keyword arguments:
             dataPin - the data pin for the DHT22
             sleepTime - time between attempts to poll for data
+            minVal - the minimum value that the sensor will output
+            maxVal - the maximum value that the sensor will output
         """
         self.dataPin = dataPin
         self.DHT_TYPE = Adafruit_DHT.DHT22
         self.sleepTime = sleepTime
+        self.__MIN = minVal
+        self.__MAX = maxVal
 
     def getValues(self):
         """Get the values for humidity and temperature"""

@@ -15,21 +15,22 @@ class JackSensor:
     and a low value detected on the jack will return false
     """
 
-    # Global Static Variables
-    __MAX = 11.0
-    __MIN = 1.0
-
-    def __init__(self, dataPin=4):
+    def __init__(self, dataPin=4, minVal=0, maxVal=11):
         """
         Create the object to talk to the jack
 
         Keyword arguments:
             dataPin - the pin that is used to detect a high or low voltage
+            minVal - the value that will indicate off
+            maxVal - the value that will indicate on
         """
         self.dataPin = dataPin
         if GPIO.getmode() == -1:
             GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.dataPin, GPIO.IN)
+
+        self.__MIN = minVal
+        self.__MAX = maxVal
 
     def getValue(self):
         """Return max if jack is high or min if low"""

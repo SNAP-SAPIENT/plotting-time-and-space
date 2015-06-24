@@ -12,10 +12,6 @@ class LED:
     Handles the control of an LED
     """
 
-    # Global Static Variables
-    __MAX = 11.0
-    __MIN = 1.0
-
     def __init__(self, dataPin=4):
         """
         Create the object to talk to the LED
