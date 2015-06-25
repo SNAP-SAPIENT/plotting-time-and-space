@@ -242,10 +242,7 @@ void exec_dwell(int time)
  */
 void exec_disable()
 {
-  // Disable the motors and lift the pen if it exists
- #ifdef PENLIFT
-   penlift_up();
- #endif
+  // Disable the motors
    rMotor->release();
    lMotor->release();
 
