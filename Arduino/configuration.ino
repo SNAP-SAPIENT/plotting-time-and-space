@@ -11,15 +11,6 @@ const int motorStepsPerRev = 200;
 const float motorMaxStepsPerSec = 200.0;
 const float motorMaxAcceleration = 200.0;
 const int stepType = INTERLEAVE;
-const float lengthPerStepMM = 0.3625;
- 
-// Sizing Information
-// TODO set all of this information in eeprom
-float motorWidthMM = 698.0;
-float pageWidthMM = 579.35;
-float pageHeightMM = 579.35;
-float pageTopPaddingMM = 400;
-float pageLeftPaddingMM = 100;
  
 // Pen Lift servo information if it exists
 #ifdef PENLIFT
@@ -83,6 +74,20 @@ void conf_set_motor_width()
 {
   // Adjust the motor width
   motorWidthMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_MOTOR_WIDTH: " + motorWidthMM);
+#endif
+  // Send that ready for next command
+  comms_ready();
+}
+
+void conf_set_length_per_step()
+{
+  // Adjust the motor width
+  lengthPerStepMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_LENGTH_PER_STEP: " + lengthPerStepMM);
+#endif
   // Send that ready for next command
   comms_ready();
 }
@@ -91,6 +96,9 @@ void conf_set_left_padding()
 {
   // Adjust the left padding
   pageLeftPaddingMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_LEFT_PADDING: " + pageLeftPaddingMM);
+#endif
   // Send that ready for next command
   comms_ready();
 }
@@ -99,6 +107,9 @@ void conf_set_top_padding()
 {
   // Adjust the top padding
   pageTopPaddingMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_TOP_PADDING: " + pageTopPaddingMM);
+#endif
   // Send that ready for next command
   comms_ready();
 }
@@ -107,6 +118,9 @@ void conf_set_canvas_width()
 {
   // Adjust the canvas width
   pageWidthMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_PAGE_WIDTH: " + pageWidthMM);
+#endif
   // Send that ready for next command
   comms_ready();
 }
@@ -115,6 +129,9 @@ void conf_set_canvas_height()
 {
   // Adjust the canvas height
   pageHeightMM = atof(SCmd.next());
+#ifdef DEBUG
+  Serial.println((String)"NEW_PAGE_HEIGHT: " + pageHeightMM);
+#endif
   // Send that ready for next command
   comms_ready();
 }

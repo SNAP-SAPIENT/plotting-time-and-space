@@ -25,9 +25,11 @@
 //#define ETHERNET_COMMS
 #define SERIAL_COMMS
 
-#define FEED_TO_PEN // Feed rate of 0 means pen up
+// Not used right now
+//#define FEED_TO_PEN // Feed rate of 0 means pen up
 
-#define DEBUG
+// Causes memory issues if not on arduino mega
+//#define DEBUG
 //---------------------------------------------------------
 
 // Include the Adafruit Motorshield v2 libs
@@ -45,6 +47,15 @@ boolean relative = false;
 boolean inches = false;
 float currentX = 0.0;
 float currentY = 0.0;
+
+// Sizing Information
+// TODO set all of this information in eeprom
+float motorWidthMM = 698.0;
+float pageWidthMM = 579.35;
+float pageHeightMM = 579.35;
+float pageTopPaddingMM = 400;
+float pageLeftPaddingMM = 100;
+float lengthPerStepMM = 0.1343;
 
 void setup() {
   // Init the serial stuff

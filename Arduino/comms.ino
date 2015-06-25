@@ -34,6 +34,7 @@ void comms_serial_setup()
   SCmd.addCommand("TPADDING", conf_set_top_padding);
   SCmd.addCommand("CWIDTH", conf_set_canvas_width);
   SCmd.addCommand("CHEIGHT", conf_set_canvas_height);
+  SCmd.addCommand("LPSTEP", conf_set_length_per_step);
 
   // Add the default handler
   SCmd.addDefaultHandler(comms_unrecognized);

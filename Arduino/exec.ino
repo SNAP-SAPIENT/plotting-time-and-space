@@ -31,15 +31,15 @@ void exec_teleport(int x, int y)
 void exec_moveline(float x, float y)
 {  
   // Calculate the new positions
-  float newLeftPos = sqrt(sq(pageTopPaddingMM + y) + sq(pageLeftPaddingMM + x)) / lengthPerStepMM;
-  float newRightPos = sqrt(sq(pageTopPaddingMM + y) + sq(motorWidthMM - pageLeftPaddingMM - x)) / lengthPerStepMM;
+  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x)) / (float)lengthPerStepMM);
+  long newRightPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)motorWidthMM - (float)pageLeftPaddingMM - x)) / (float)lengthPerStepMM);
   
   // Set the new positions
   leftMotor.moveTo(newLeftPos);
   rightMotor.moveTo(newRightPos);
   
   // Now calcuate the ratio between the motor distance to move
-  float moveRatio = (newLeftPos - leftMotor.currentPosition()) / (newRightPos - rightMotor.currentPosition());
+  float moveRatio = ((float)newLeftPos - (float)leftMotor.currentPosition()) / ((float)newRightPos - (float)rightMotor.currentPosition());
   // Fix the failure of the abs function
   if(moveRatio < 0.0) 
   {
@@ -156,8 +156,8 @@ void exec_moveline2(float x, float y)
 void exec_moverapid(float x, float y)
 {
   // Calculate the new positions
-  float newLeftPos = sqrt(sq(pageTopPaddingMM + y) + sq(pageLeftPaddingMM + x)) / lengthPerStepMM;
-  float newRightPos = sqrt(sq(pageTopPaddingMM + y) + sq(motorWidthMM - pageLeftPaddingMM - x)) / lengthPerStepMM;
+  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x)) / (float)lengthPerStepMM);
+  long newRightPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)motorWidthMM - (float)pageLeftPaddingMM - x)) / (float)lengthPerStepMM);
   
   // Set the new positions
   leftMotor.moveTo(newLeftPos);
