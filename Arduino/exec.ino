@@ -31,7 +31,7 @@ void exec_teleport(int x, int y)
 void exec_moveline(float x, float y)
 {  
   // Calculate the new positions
-  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x)) / (float)lengthPerStepMM);
+  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x))/(float)lengthPerStepMM);
   long newRightPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)motorWidthMM - (float)pageLeftPaddingMM - x)) / (float)lengthPerStepMM);
   
   // Set the new positions
@@ -63,21 +63,11 @@ void exec_moveline(float x, float y)
   }
   
   // Run the motors
-  if((x - currentX > 0 && y - currentY < 0) || (x - currentX < 0 && y - currentY > 0))
+
+  while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
   {
-    while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
-    {
-      leftMotor.run();
-      rightMotor.run();
-    }
-  }
-  else
-  {
-    while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
-    {
-      rightMotor.run();
-      leftMotor.run();
-    }
+    leftMotor.run();
+    rightMotor.run();
   }
   
   // Set the new x and y
