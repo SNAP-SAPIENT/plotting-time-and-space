@@ -8,8 +8,8 @@
  
 // Motor Information
 const int motorStepsPerRev = 200;
-const float motorMaxStepsPerSec = 200.0;
-const float motorMaxAcceleration = 200.0;
+const float motorMaxStepsPerSec = 100.0;
+const float motorMaxAcceleration = 100.0;
 const int stepType = INTERLEAVE;
  
 // Pen Lift servo information if it exists

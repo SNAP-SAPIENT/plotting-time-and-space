@@ -50,12 +50,12 @@ float currentY = 0.0;
 
 // Sizing Information
 // TODO set all of this information in eeprom
-float motorWidthMM = 698.0;
-float pageWidthMM = 579.35;
-float pageHeightMM = 579.35;
+float motorWidthMM = 800.0;
+float pageWidthMM = 500.00;
+float pageHeightMM = 500.00;
 float pageTopPaddingMM = 400;
-float pageLeftPaddingMM = 100;
-float lengthPerStepMM = 0.1343;
+float pageLeftPaddingMM = 150;
+float lengthPerStepMM = 0.12525;
 
 void setup() {
   // Init the serial stuff
