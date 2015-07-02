@@ -57,8 +57,8 @@ float pageLeftPaddingMM = 150;
 float lengthPerStepMM = 0.12525;
 
 // Left and right motor positions
-int leftMotorPos = 0;
-int rightMotorPos = 0;
+long leftMotorPos = 0;
+long rightMotorPos = 0;
 
 void setup() {
   // Init the serial stuff
