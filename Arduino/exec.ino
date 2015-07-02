@@ -11,10 +11,10 @@
  */
 void exec_teleport(int x, int y)
 {
-  float leftPos = sqrt(sq(pageTopPaddingMM + y) + sq(pageLeftPaddingMM + x)) / lengthPerStepMM;
-  float rightPos = sqrt(sq(pageTopPaddingMM + y) + sq(motorWidthMM - pageLeftPaddingMM - x)) / lengthPerStepMM;
-  leftMotor.setCurrentPosition(leftPos);
-  rightMotor.setCurrentPosition(rightPos);
+  long leftPos = round(sqrt(sq(pageTopPaddingMM+y) + sq(pageLeftPaddingMM+x)) / lengthPerStepMM);
+  long rightPos = round(sqrt(sq(pageTopPaddingMM+y) + sq(motorWidthMM-pageLeftPaddingMM-x)) / lengthPerStepMM);
+  leftMotorPos = leftPos;
+  rightMotorPos = rightPos;
   
   // Set the new x and y
   currentX = x;
@@ -27,110 +27,54 @@ void exec_teleport(int x, int y)
 
 /*
  * Move the drawing tool to the xy position given in a line
- */
-void exec_moveline(float x, float y)
-{  
-  // Calculate the new positions
-  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x))/(float)lengthPerStepMM);
-  long newRightPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)motorWidthMM - (float)pageLeftPaddingMM - x)) / (float)lengthPerStepMM);
-  
-  // Set the new positions
-  leftMotor.moveTo(newLeftPos);
-  rightMotor.moveTo(newRightPos);
-  
-  // Now calcuate the ratio between the motor distance to move
-  float moveRatio = ((float)newLeftPos - (float)leftMotor.currentPosition()) / ((float)newRightPos - (float)rightMotor.currentPosition());
-  // Fix the failure of the abs function
-  if(moveRatio < 0.0) 
-  {
-    moveRatio = (float)0.0 - (float)moveRatio;
-  }
-  
-  // Set the speeds and ratios accordingly
-  if(moveRatio < 1.0)
-  {
-    leftMotor.setMaxSpeed(motorMaxStepsPerSec * moveRatio);
-    rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-    leftMotor.setAcceleration(motorMaxAcceleration * moveRatio);
-    rightMotor.setAcceleration(motorMaxAcceleration);
-  }
-  else
-  {
-    leftMotor.setMaxSpeed(motorMaxStepsPerSec);
-    rightMotor.setMaxSpeed(motorMaxStepsPerSec / moveRatio);
-    leftMotor.setAcceleration(motorMaxAcceleration);
-    rightMotor.setAcceleration(motorMaxAcceleration / moveRatio);
-  }
-  
-  // Run the motors
-
-  while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
-  {
-    leftMotor.run();
-    rightMotor.run();
-  }
-  
-  // Set the new x and y
-  currentX = x;
-  currentY = y;
-  
-#ifdef DEBUG
-  Serial.println((String)"MOVE_LINE: left motor = " + leftMotor.currentPosition() + " right motor = " + rightMotor.currentPosition());
-#endif
-}
-
-/*
- * Move the drawing tool to the xy position given in a line
  * This method uses a different stepping method in an
  * attempt to keep the line straighter
  */
-void exec_moveline2(float x, float y)
+void exec_moveline(float x, float y)
 {  
-  // Calculate the new positions
-  float newLeftPos = sqrt(sq(pageTopPaddingMM + y) + sq(pageLeftPaddingMM + x)) / lengthPerStepMM;
-  float newRightPos = sqrt(sq(pageTopPaddingMM + y) + sq(motorWidthMM - pageLeftPaddingMM - x)) / lengthPerStepMM;
-  
-  float changeLeft = newLeftPos - leftMotor.currentPosition();
-  float changeRight = newRightPos - rightMotor.currentPosition();
-  
-  // Calculate for bresenham's alg
-  long ad1 = abs(changeLeft);
-  long ad2 = abs(changeRight);
-  int dir1 = changeLeft<0?BACKWARD:FORWARD;
-  int dir2 = changeRight<0?FORWARD:BACKWARD;
-  long over = 0;
-  long i;
-  
-  if(ad1>ad2)
+  // Calculate the start and end positions and initial conditions
+  long x1 = round(sqrt(sq(pageTopPaddingMM+y) + sq(pageLeftPaddingMM+x)) / lengthPerStepMM);
+  long y1 = round(sqrt(sq(pageTopPaddingMM+y) + sq(motorWidthMM-pageLeftPaddingMM-x)) / lengthPerStepMM);
+  long x0 = leftMotorPos;
+  long y0 = rightMotorPos;
+  long dx = x1 - x0;
+  long dy = y1 - y0;
+  long dxabs = abs(dx);
+  long dyabs = abs(dy);
+  int signx = dx<0?BACKWARD:FORWARD;
+  int signy = dy<0?FORWARD:BACKWARD;
+  float err = 0.0;
+  if(dxabs > dyabs)
   {
-    for(i=0;i<ad1;i++)
+    // Shallow line
+    float deltaerr = (float)dyabs / (float)dxabs;
+    for(int i = 0; i <= dxabs; i++)
     {
-      leftStep(dir1);
-      over += ad2;
-      if(over>ad1)
+      leftStep(signx);
+      err += deltaerr;
+      if(err > 0.5)
       {
-        over -= ad1;
-        rightStep(dir2);
+        rightStep(signy);
+        err -= 1;
       }
-      delayMicroseconds(5000);
     }
   }
   else
   {
-    for(i=0;i<ad2;i++)
+    // Steep line
+    float deltaerr = (float)dxabs / (float)dyabs;
+    for(int i = 0; i <= dyabs; i++)
     {
-      rightStep(dir2);
-      over += ad1;
-      if(over >= ad2)
+      rightStep(signy);
+      err += deltaerr;
+      if(err > 0.5)
       {
-        over -= ad2;
-        leftStep(dir1);
+        leftStep(signx);
+        err -= 1;
       }
-      delayMicroseconds(5000);
     }
-  } 
+  }
   
-  // Set the new x and y
   currentX = x;
   currentY = y;
   
@@ -145,34 +89,8 @@ void exec_moveline2(float x, float y)
  */
 void exec_moverapid(float x, float y)
 {
-  // Calculate the new positions
-  long newLeftPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)pageLeftPaddingMM + x)) / (float)lengthPerStepMM);
-  long newRightPos = round(sqrt(sq((float)pageTopPaddingMM + y) + sq((float)motorWidthMM - (float)pageLeftPaddingMM - x)) / (float)lengthPerStepMM);
-  
-  // Set the new positions
-  leftMotor.moveTo(newLeftPos);
-  rightMotor.moveTo(newRightPos);
-  
-  // Move as fast as possible
-  leftMotor.setMaxSpeed(motorMaxStepsPerSec);
-  rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-  leftMotor.setAcceleration(motorMaxAcceleration);
-  rightMotor.setAcceleration(motorMaxAcceleration);
-
-  // Move the motors to the new positions
-  while(leftMotor.distanceToGo() != 0 || rightMotor.distanceToGo() != 0)
-  {
-    leftMotor.run();
-    rightMotor.run();
-  }
-  
-  // Set the new x and y
-  currentX = x;
-  currentY = y;
-  
-#ifdef DEBUG
-  Serial.println((String)"MOVE_RAPID: left motor = " + leftMotor.currentPosition() + " right motor = " + rightMotor.currentPosition());
-#endif
+  // For now just move line will be the same as move rapid
+  exec_moveline(x, y);
 }
 
 /*
@@ -252,10 +170,10 @@ void exec_disable()
 void exec_enable()
 {
   // Enable the motors and lock them by wiggling them
-  leftMotor.runToNewPosition(leftMotor.currentPosition()+4);
-  rightMotor.runToNewPosition(rightMotor.currentPosition()+4);
-  leftMotor.runToNewPosition(leftMotor.currentPosition()-4);
-  rightMotor.runToNewPosition(rightMotor.currentPosition()-4);
+  rightStep(FORWARD);
+  leftStep(FORWARD);
+  rightStep(BACKWARD);
+  leftStep(BACKWARD);
 
 #ifdef DEBUG
   Serial.println((String)"MOTORS_ENABLED: left motor = " + leftMotor.currentPosition() + " right motor = " + rightMotor.currentPosition());

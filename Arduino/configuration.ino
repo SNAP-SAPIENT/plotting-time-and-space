@@ -8,7 +8,7 @@
  
 // Motor Information
 const int motorStepsPerRev = 200;
-const float motorMaxStepsPerSec = 100.0;
+const float motorMaxStepsPerSec = 200.0;
 const float motorMaxAcceleration = 100.0;
 const int stepType = INTERLEAVE;
  
@@ -25,34 +25,46 @@ const int penliftDelay = 500;
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *lMotor = AFMS.getStepper(motorStepsPerRev, 1);
 Adafruit_StepperMotor *rMotor = AFMS.getStepper(motorStepsPerRev, 2);
- 
-void forwardL() { lMotor->onestep(FORWARD, stepType); }
-void backwardL() { lMotor->onestep(BACKWARD, stepType); }
-void forwardR() { rMotor->onestep(FORWARD, stepType); }
-void backwardR() { rMotor->onestep(BACKWARD, stepType); }
-void leftStep(int dir) { lMotor->onestep(dir, stepType); }
-void rightStep(int dir) { lMotor->onestep(dir, stepType); }
- 
-AccelStepper leftMotor(forwardL, backwardL);
-AccelStepper rightMotor(backwardR, forwardR); 
+
+void leftStep(int dir) 
+{
+   lMotor->onestep(dir, stepType);
+   if(dir == 1)
+   {
+     leftMotorPos += 1;
+   }
+   else
+   {
+     leftMotorPos -= 1;
+   }
+   delay(1000/motorMaxStepsPerSec);
+}
+void rightStep(int dir)
+{
+  rMotor->onestep(dir, stepType);
+  if(dir == 1)
+  {
+    rightMotorPos -= 1;
+  }
+  else
+  {
+    rightMotorPos += 1;
+  }
+  delay(1000/motorMaxStepsPerSec);
+}
  
 void configuration_setup()
 {
    // Begin the motor shield
    AFMS.begin();
    
-   // Set the max speeds, min speeds, and acceleration of the motors
-   leftMotor.setMaxSpeed(motorMaxStepsPerSec);
-   rightMotor.setMaxSpeed(motorMaxStepsPerSec);
-   leftMotor.setAcceleration(motorMaxAcceleration);
-   rightMotor.setAcceleration(motorMaxAcceleration);
    
    // Set the starting position of the motors to be the
    //  top left of the page (0,0) of the coordinate system
    float startLengthLeft = sqrt(sq(pageTopPaddingMM) + sq(pageLeftPaddingMM)) / lengthPerStepMM;
    float startLengthRight = sqrt(sq(pageTopPaddingMM) + sq(motorWidthMM - pageLeftPaddingMM)) / lengthPerStepMM;
-   leftMotor.setCurrentPosition(startLengthLeft);
-   rightMotor.setCurrentPosition(startLengthRight);
+   leftMotorPos = startLengthLeft;
+   rightMotorPos = startLengthRight;
    
    // Set up the servo for the pen if it exists
 #ifdef PENLIFT

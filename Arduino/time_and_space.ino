@@ -36,7 +36,6 @@
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_PWMServoDriver.h"
-#include <AccelStepper.h>  // Let us move two motors at once
 
 // This would be nice to pull out of here and put in comms but not now
 #include <SerialCommand.h>
@@ -56,6 +55,10 @@ float pageHeightMM = 500.00;
 float pageTopPaddingMM = 400;
 float pageLeftPaddingMM = 150;
 float lengthPerStepMM = 0.12525;
+
+// Left and right motor positions
+int leftMotorPos = 0;
+int rightMotorPos = 0;
 
 void setup() {
   // Init the serial stuff
