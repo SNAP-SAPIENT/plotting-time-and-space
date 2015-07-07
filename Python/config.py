@@ -6,8 +6,15 @@ The config file here contains constants and functions that are used fro
 the plotting time and space tool
 """
 
+# Communication information
+baudrate = 57600
+port = '/dev/ttyACM0'
+
 # Machine Dimensions in MM
 motorWidth = 696
+mmPerStep = 0.12525
+topPadding = 400
+leftPadding = 150
 realWidth = 500
 realHeight = 500
 startingX = 0
@@ -31,6 +38,10 @@ startingMode = 0
 #  0 - Consecutive
 #  1 - Random
 modeSwitch = 0
+
+# Chunk dimensions for mode usage
+chunksWide = 10
+chunksHigh = 10
 
 # Pixel Shape
 pixelShape = 0

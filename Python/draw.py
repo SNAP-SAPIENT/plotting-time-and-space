@@ -27,45 +27,46 @@ class Draw:
     __ZIG_ZAG_PER_PIXEL = 6    # Number of zigzags per pixel (Must be even)
 
     def __init__(
-            self, communication, realWidth=500, realHeight=500,
-            pixelWidth=640, pixelHeight=480, pixelMode=0, maxLineDist=10,
-            jitter=0, slope=0, topPadding=400, leftPadding=100, motorWidth=800
+            self, communication,
+            realWidth=500.0, realHeight=500.0,
+            topPadding=400.0, leftPadding=100.0,
+            motorWidth=800.0, mmPerStep=0.1343,
+            maxLineDist=10.0, pixelShape=0,
+            startX=0, startY=0
             ):
         """
         Create the initial drawing system with all given info
 
         Keyword arguments:
+            communication - the communication object to talk to the motors
             realWidth - the width of the drawing surface in mm
             realHeight - the height of the drawing surface in mm
             topPadding - the top padding of the drawing surface in mm
             leftPadding - the left padding of the drawing surface in mm
             motorWidth - the distance the motors are from each other in mm
-            pixelWidth - the width of the drawing surface in pixels
-            pixelHeight - the height of the drawing surface in piexls
-            pixelMode - the pixel drawing mode (how a pixel is drawn)
-            communication - the communication object to talk to the motors
-            jitter - the initial jitter of the pixels
-            slope - the initial slope of the pixels
+            mmPerStep - the distance a string moves from one step in mm
+            maxLineDist - the max distance that makes up a line segment
+            pixelShape - the pixel drawing shape (how a pixel is drawn)
+            startX - the starting x location for the system
+            startY - the starting y location for the system
         """
         # First store the settings
         self.comms = communication
         self.realWidth = float(realWidth)
         self.realHeight = float(realHeight)
-        self.pixelWidth = pixelWidth
-        self.pixelHeight = pixelHeight
-        self.jitter = jitter
-        self.slope = slope
-        if pixelMode <= 2 and pixelMode >= 0:
-            self.pixelMode = pixelMode
+        # Default pixel size is 10mm by 10mm
+        self.pixelWidth = (realWidth/10)
+        self.pixelHeight = (realHeight/10)
+        # Jitter and slope start at 0
+        self.jitter = 0
+        self.slope = 0
+        # Pixel mode setting
+        if pixelShape <= 2 and pixelShape >= 0:
+            self.pixelShape = pixelShape
         else:
-            self.pixelMode = 0
+            self.pixelShape = 0
+        # Max line dist is use to make smoother lines
         self.maxLineDist = maxLineDist
-
-        # Calculate pixel size
-        self.pixelSizeWidth = float(realWidth) / float(pixelWidth)
-        self.pixelSizeHeight = float(realHeight) / float(pixelHeight)
-        self.zigZagWidth = (self.pixelSizeWidth /
-            (self.__ZIG_ZAG_PER_PIXEL + 2))
 
         # Store current state info
         self.currentPos = (0.0, 0.0)
@@ -79,14 +80,15 @@ class Draw:
         self.comms.setLeftPadding(leftPadding)
         self.comms.setRealWidth(self.realWidth)
         self.comms.setRealHeight(self.realHeight)
+        self.comms.setMMPerStep(mmPerStep)
 
         # Reset the starting pos due to the padding changes
-        self.comms.teleport(0.0, 0.0)
+        self.comms.teleport(startX, startY)
 
     def setPixelMode(self, mode):
         """Set the pixel drawing mode to the passed mode"""
         if mode <= 2 and mode >= 0:
-            self.pixelMode = mode
+            self.pixelShape = mode
 
     def setJitter(self, jitter):
         """Set the pixel jitter to the passed jitter"""
@@ -130,11 +132,11 @@ class Draw:
         x = max(0, min(self.pixelWidth, x))
         y = max(0, min(self.pixelHeight, y))
 
-        if self.pixelMode == self.ZIGZAG_MODE:
+        if self.pixelShape == self.ZIGZAG_MODE:
             self._drawZigZag(value, x, y, jttr, slop, speed)
-        if self.pixelMode == self.FILL_MODE:
+        if self.pixelShape == self.FILL_MODE:
             self._drawFill(value, x, y, jttr, slop, speed)
-        if self.pixelMode == self.LINE_MODE:
+        if self.pixelShape == self.LINE_MODE:
             self._drawLine(value, x, y, jttr, slop, speed)
 
     def _drawZigZag(self, value, x, y, jttr, slop, speed):
@@ -153,20 +155,24 @@ class Draw:
             # Do not draw anything for white
             return
 
+        # Calculate pixel size
+        pixelSizeWidth = float(self.realWidth) / float(self.pixelWidth)
+        pixelSizeHeight = float(self.realHeight) / float(self.pixelHeight)
+        zigZagWidth = (pixelSizeWidth /
+            (float(self.__ZIG_ZAG_PER_PIXEL)))
+
         # Get special values
-        centerX = (float(x) * self.pixelSizeWidth) + (self.pixelSizeWidth /
-            2.0)
-        centerY = (float(y) * self.pixelSizeHeight) + (self.pixelSizeHeight /
-            2.0)
-        zigZagHeight = (self.pixelSizeHeight / 510.0) * (255.0 - value)
+        centerX = (float(x) * pixelSizeWidth) + (pixelSizeWidth / 2.0)
+        centerY = (float(y) * pixelSizeHeight) + (pixelSizeHeight / 2.0)
+        zigZagHeight = (pixelSizeHeight / 510.0) * (255.0 - value)
 
         # Turn the slop into rads
-        slop = ((math.pi/2) / (config.MAX - config.MIN)) * (slop - config.MIN)
+        slop = ((math.pi/2.0) / (config.MAX - config.MIN)) * (slop - config.MIN)
 
         # Mark out the start and end place
-        startX = float(x) * self.pixelSizeWidth
+        startX = float(x) * pixelSizeWidth
         startY = centerY
-        endX = startX + self.pixelSizeWidth
+        endX = startX + pixelSizeWidth
         endY = centerY
 
         # Rotate the end
@@ -192,16 +198,16 @@ class Draw:
         self.comms.penDown()
 
         # Begin the drawing loop
-        for i in range(1, self.__ZIG_ZAG_PER_PIXEL + 1):
+        for i in range(0, self.__ZIG_ZAG_PER_PIXEL):
             # Calculate the next point
-            nextX = startX + (self.zigZagWidth * float(i))
+            nextX = startX + (zigZagWidth/2.0) + (zigZagWidth*float(i))
             if i % 2 == 0:
                 nextY = startY + zigZagHeight
             else:
                 nextY = startY - zigZagHeight
 
             # Add jitter
-            nextX = (nextX + ((self.pixelSizeWidth / 22.0) *
+            nextX = (nextX + ((pixelSizeWidth / 22.0) *
                     random.uniform(-jttr, jttr)))
             if nextX < startX:
                 nextX = startX
@@ -224,7 +230,6 @@ class Draw:
         self.moveSmoothLine(eX, eY)
         # Adjust the current pos
         self.currentPos = (eX, eY)
-        # Now done
 
     def moveSmoothLine(self, x, y):
         """
@@ -252,7 +257,7 @@ class Draw:
                 # Adjust the current pos
                 self.currentPos = (newX, newY)
             # Now move the rest of the way
-            self.comms.moveLine(x, y)
+            self.moveSmoothLine(x, y)
         else:
             # Just move to the new position
             self.comms.moveLine(x, y)

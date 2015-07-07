@@ -28,11 +28,12 @@ def main():
     # Now create the communication and draw objects
     comms = communication.Communication()
     dr = draw.Draw(comms,
-            realWidth=500, realHeight=500,
-            leftPadding=150, topPadding=400,
-            motorWidth=800,
-            pixelWidth=pix.shape[1], pixelHeight=pix.shape[0])
+            realWidth=400.0, realHeight=400.0,
+            leftPadding=150.0, topPadding=400.0,
+            motorWidth=700.0, mmPerStep=0.12535)
 
+    dr.pixelWidth = pix.shape[1]
+    dr.pixelHeight = pix.shape[0]
     # Create the potentiometer to adjust the jitter
     jttr = potentiometer.PotentiometerSensor(addr=0x4A, ch=1)
 

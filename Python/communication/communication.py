@@ -179,6 +179,12 @@ class Communication:
         self.serial.write("CHEIGHT " + str(height) + "\r")
         self.serial.flush()
 
+    def setMMPerStep(self, mm):
+        """Tells the system the mm moved per step (Assumes calcs done)"""
+        self._ready()
+        self.serial.write("LPSTEP " + str(mm) + "\r")
+        self.serial.flush()
+
     def _ready(self):
         """Returns once the serial is ready for the next command"""
         while True:

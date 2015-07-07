@@ -15,7 +15,7 @@ def main():
     comms = communication.Communication()
     reset = switch.SwitchSensor(dataPin=26)
 
-    time.sleep(1)
+    time.sleep(5)
 
     # Disable the motors
     comms.disable()

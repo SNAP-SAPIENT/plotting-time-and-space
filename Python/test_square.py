@@ -8,9 +8,6 @@ from communication import communication as Comm
 def main():
     comms = Comm.Communication(port='/dev/ttyACM0')
 
-    comms.setRealHeight(498)
-    comms.setRealWidth(498)
-
     comms.penUp()
     comms.moveRapid(0,0)
     comms.penDown()
