@@ -35,6 +35,7 @@ class Communication:
         """
         self.serial = serial.Serial(baudrate=baudrate, port=port)
         self.serial.stopbits = 1
+        self.currentPos = (0,0)
 
     def __del__(self):
         """Close the serial connection before destructing"""
@@ -68,6 +69,7 @@ class Communication:
         y = round(y, 4)
         self.serial.write("G01 X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
+        self.currentPos = (x,y)
 
     def moveArc(self, x, y, i, j, clockwise=True):
         """Moves in an arc from the current position to the new position
@@ -86,6 +88,7 @@ class Communication:
             self.serial.write("G03 X" + str(x) + " Y" + str(y) + " I" +
                     str(i) + " J" + str(j) + "\r")
         self.serial.flush()
+        self.currentPos = (x,y)
 
     def moveRapid(self, x, y):
         """Moves from the current position to the new position"""
@@ -95,6 +98,7 @@ class Communication:
         y = round(y, 4)
         self.serial.write("G00 X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
+        self.currentPos = (x,y)
 
     def dwell(self, sleepTime):
         """Causes the system to wait the given miliseconds"""
@@ -148,6 +152,7 @@ class Communication:
         y = round(y, 4)
         self.serial.write("TELEPORT X" + str(x) + " Y" + str(y) + "\r")
         self.serial.flush()
+        self.currentPos = (x,y)
 
     def setMotorWidth(self, width):
         """Tells the system the motor width"""

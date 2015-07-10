@@ -32,13 +32,14 @@ def main():
 
     # First init the brains
     system = brains.Brains()
+    system.image = pix
 
     # Now set the system in reset mode to indicate that we are ready
     system.reset()
 
     # Once the reset is exited, let us start drawing with the passed picture
     # At the moment
-    system.run(pix)
+    system.run()
 
 if __name__ == '__main__':
     main()

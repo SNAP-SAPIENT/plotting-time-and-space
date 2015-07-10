@@ -33,3 +33,7 @@ class LightSensor:
         """Return the current value of the lux sensor"""
         lux = self.tsl.getLux(self.gain)
         return (lux / 40000.0) * (self.__MAX - self.__MIN) + self.__MIN
+
+    def getRawValue(self):
+        """Return the raw value of the lux sensor"""
+        return self.tsl.getLux(self.gain)

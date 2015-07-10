@@ -22,12 +22,7 @@ class Chunk_Random(chunk.Chunk):
     def drawNextPixel(self):
         """
         Uses the current pixel info to determine the next pixel to draw
-        Returns (-1,-1) if there are no more pixels left to draw
-        It is assumed that the passed pixel has been drawn
-
-        Arguments:
-            currentPixel - The assumed pixel that was last drawn and needs
-                to be advanced
+        Returns None if there are no more pixels left to draw
         """
         if not self.filled:
             # No pixels to write

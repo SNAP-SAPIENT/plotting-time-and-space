@@ -24,11 +24,7 @@ class Chunk_Column(chunk.Chunk):
     def drawNextPixel(self):
         """
         Uses the current pixel info to determine the next pixel to draw
-        Return s(-1, -1) if there are no more pixels left to draw
-
-        Arguments:
-            currentPixel - The assumed pixel that was last drawn and needs
-                to be advanced
+        Returns None if there are no more pixels left to draw
         """
         if not self.filled:
             # No pixels to write
@@ -47,6 +43,6 @@ class Chunk_Column(chunk.Chunk):
             return None
         elif self.lastPixelDrawn[1] == self.pixels.shape[1] - 1:
             self.drawn = True
- 
+
         self.drawnPixels[self.lastPixelDrawn[0]][self.lastPixelDrawn[1]]=1
         return self.lastPixelDrawn

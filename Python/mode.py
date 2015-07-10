@@ -6,7 +6,6 @@ Base class for mode that other modes will inherit
 """
 
 import chunk
-import config
 
 class Mode:
     """
@@ -15,7 +14,7 @@ class Mode:
     picture but by drawing each chunk in a different order.
     """
 
-    def __init__(self, name, indicators, chunksWide, chunksHigh):
+    def __init__(self, name, indicators, chunksWide, chunksHigh, MIN=0, MAX=11):
         """
         Sets up the initial parameters for the mode type
 
@@ -25,6 +24,9 @@ class Mode:
        c        active (must be an itterable)
             chunksWide - The number of chunks wide
             chunksHigh - The number of chunks high
+        Named Arguments:
+            MIN - The min value for filling a mode
+            MAX - The max value for filling a mode
         """
         self.name = name
         self.indicators = indicators
@@ -32,6 +34,8 @@ class Mode:
         self.chunkArray = None
         self.chunksWide = chunksWide
         self.chunksHigh = chunksHigh
+        self.MIN = MIN
+        self.MAX = MAX
 
     def activate(self):
         """
@@ -105,8 +109,8 @@ class Mode:
         """
         # Calculate the number of chunks to add based on the number of
         # chunks left in the chunkArray
-        maxToFill = int(((((len(self.chunkArray)-1) * (cplx-config.MIN))
-            / (config.MAX-config.MIN)) + 1))
+        maxToFill = int(((((len(self.chunkArray)-1) * (cplx-self.MIN))
+            / (self.MAX-self.MIN)) + 1))
 
         maxToFill = (len(self.chunkArray)+1) - maxToFill
 

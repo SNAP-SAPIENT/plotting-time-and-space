@@ -41,13 +41,13 @@ class MicrophoneSensor:
         self.__MIN = minVal
         self.__MAX = maxVal
 
-    def getValue(self):
-        """Return the current value of the microphone"""
+    def getQuickValue(self):
+        """Return the value of a single pull of the microphone"""
         volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
         return (volts / 3304) * (self.__MAX - self.__MIN) + self.__MIN
 
-    def getRawValue(self):
-        """Returns the current raw value of the microphone"""
+    def getRawQuickValue(self):
+        """Returns the raw value of a single pull of the microphone"""
         volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
         return volts
 
@@ -116,3 +116,15 @@ class MicrophoneSensor:
         """
         low, high = self.getRawPeakValues(samples)
         return high - low
+
+    def getValue(self):
+        """
+        Returns the get dist peak value with a passed samples of 15
+        """
+        return self.getDistPeakValue(30)
+
+    def getRawValue(self):
+        """
+        Returns the get raw dist peak value with a passed samples of 15
+        """
+        return self.getRawDistPeakValue(30)

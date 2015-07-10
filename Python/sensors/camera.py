@@ -45,7 +45,7 @@ class Camera:
         self.camera.capture(picture, 'yuv', resize=(width,height))
 
         # Finally return the array
-        return picture
+        return picture[:,:,0]
 
     def setBrightness(self, value):
         """Sets the brightness of the camera to the passed value"""

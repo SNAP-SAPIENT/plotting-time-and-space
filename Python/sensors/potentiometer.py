@@ -6,6 +6,7 @@ The Potentiometer sensors are hooked up through the ADS1015 to convert the
 analog signal to an I2C input
 """
 
+import math
 from Adafruit.Adafruit_ADS1x15 import ADS1x15
 
 class PotentiometerSensor:
@@ -41,11 +42,36 @@ class PotentiometerSensor:
         self.__MIN = minVal
         self.__MAX = maxVal
 
+    def getRawAverageValue(self, samples=20):
+        """Return the average value of the number of samples taken"""
+        total = 0
+        # Take the number of samples
+        for i in range(samples):
+            total += self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
+        # Return the average
+        return total / samples
+
+
+    def getAverageValue(self, samples=20):
+        """Return the average value of the number of samples taken"""
+        total = 0
+        # Take the number of samples
+        for i in range(samples):
+            total += (3296 - self.adc.readADCSingleEnded(self.ch, self.gain,
+                self.sps))
+        # Average the values
+        avg = total / samples
+
+        # Return the converted value
+        adjusted = round((((avg)*(self.__MAX-self.__MIN))/34)+self.__MIN)
+        return min(self.__MAX, max(self.__MIN, adjusted))
+
     def getValue(self):
         """Return the current value of the potentiometer"""
-        volts = self.adc.readADCSingleEnded(self.ch, self.gain, self.sps)
-        return (self.__MAX - ((volts -3264.0) / 40.0) * (self.__MAX -
-            self.__MIN))
+        volts = (3296 - self.adc.readADCSingleEnded(self.ch, self.gain,
+                self.sps))
+        adjusted = round((((volts)*(self.__MAX-self.__MIN))/34)+self.__MIN)
+        return min(self.__MAX, max(self.__MIN, adjusted))
 
     def getRawValue(self):
         """Return the current raw value of the potentiometer"""

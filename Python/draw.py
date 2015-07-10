@@ -187,8 +187,8 @@ class Draw:
         sY = (((startX - centerX)*math.sin(slop) +
                 (startY - centerY)*math.cos(slop)) + centerY)
 
-        if (round(self.currentPos[0], 3) != round(sX, 3) or
-            round(self.currentPos[1], 3) != round(sY, 3)):
+        if (round(self.comms.currentPos[0], 3) != round(sX, 3) or
+            round(self.comms.currentPos[1], 3) != round(sY, 3)):
             # Move to the current position
             self.comms.penUp()
             # Move in chunks if the line is too long
@@ -238,8 +238,8 @@ class Draw:
         """
 
         # Calculate the x and y vals
-        xDist = x - self.currentPos[0]
-        yDist = y - self.currentPos[1]
+        xDist = x - self.comms.currentPos[0]
+        yDist = y - self.comms.currentPos[1]
 
         # Calculate the line distance
         lineDist = math.sqrt(xDist**2 + yDist**2)
@@ -250,8 +250,8 @@ class Draw:
             lineChunks = lineDist / self.maxLineDist
             for i in range(math.trunc(lineChunks)):
                 # Move line the partial distance
-                newX = self.currentPos[0] + (xDist / lineChunks)
-                newY = self.currentPos[1] + (yDist / lineChunks)
+                newX = self.comms.currentPos[0] + (xDist / lineChunks)
+                newY = self.comms.currentPos[1] + (yDist / lineChunks)
                 self.comms.moveLine(newX, newY)
 
                 # Adjust the current pos

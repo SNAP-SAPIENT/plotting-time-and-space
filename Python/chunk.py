@@ -9,6 +9,7 @@ The chunk is an instrumental part to the image composition and determining
 the next pixel to be drawn.
 """
 
+import sys
 import numpy as np
 
 class Chunk:
@@ -41,6 +42,29 @@ class Chunk:
         """Retruns the picamera array shape to use"""
         return self.pixels.shape
 
+    def getSingleChunkShape(self):
+        """Returns the shape of one square chunk"""
+        # Find the min and max values for each dimension
+        minX = sys.maxint
+        maxX = 0
+        minY = sys.maxint
+        maxY = 0
+        for loc in self.location:
+            if loc[0] > maxY:
+                maxY = loc[0]
+            if loc[0] < minY:
+                minY = loc[0]
+            if loc[1] > maxX:
+                maxX = loc[1]
+            if loc[1] < minX:
+                minX = loc[1]
+
+        # Now use these values to calcualte the size of one square
+        width = int((self.pixels.shape[1]) / ((maxX - minX)+1))
+        height = int((self.pixels.shape[0]) / ((maxY - minY)+1))
+        # Shapes are given in the form (y,x)
+        return (height, width)
+
     def addPixels(self, pixels):
         """
         Adds the pixels to the pixel array as well as stores the pixels
@@ -54,11 +78,7 @@ class Chunk:
     def drawNextPixel(self):
         """
         Uses the current pixel info to determine the next pixel to draw
-        Returns (-1,-1) if there are no more pixels left to draw
-
-        Arguments:
-            currentPixel - The assumed pixel that was last drawn and needs
-                to be advanced
+        Returns None if there are no more pixels left to draw
         """
         if not self.filled:
             # No pixels to write

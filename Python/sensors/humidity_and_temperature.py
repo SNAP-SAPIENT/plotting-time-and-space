@@ -64,3 +64,53 @@ class HumidityAndTemperatureSensor:
                 continue
             else:
                 return (humidity, temp)
+
+class HumiditySensor:
+    """
+    A holder for a humidity and temperature sensor that contains only
+    methods for grabbing humidity info
+    """
+
+    def __init__(self, sensor):
+        # Store the sensor
+        self.sensor = sensor
+
+    def getValue(self):
+        """
+        Use the sensor to retrieve the humidity and temperature values
+        and only return the humidity value
+        """
+        return self.sensor.getValues()[0]
+
+    def getRawValue(self):
+        """
+        Use the sensor to retrieve the humidity and temperature raw values
+        and only return the humidity value
+        """
+        return self.sensor.getRawValues()[0]
+
+class TemperatureSensor:
+    """
+    A holder for a humidity and temperature sensor that contains only
+    methods for grabbing temperature info
+    """
+
+    def __init__(self, sensor):
+        # Store the sensor
+        self.sensor = sensor
+
+    def getValue(self):
+        """
+        Use the sensor to retrieve the humidity and temperature values
+        and only return the temperature value
+        """
+        return self.sensor.getValues()[1]
+
+    def getRawValue(self):
+        """
+        Use the sensor to retrieve the humidity and temperature raw values
+        and only return the temperature value
+        """
+        return self.sensor.getRawValues()[1]
+
+

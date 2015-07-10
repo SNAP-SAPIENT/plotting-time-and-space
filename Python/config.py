@@ -6,23 +6,30 @@ The config file here contains constants and functions that are used fro
 the plotting time and space tool
 """
 
+# Import modes for mode creation
+import mode_horizontal
+import mode_vertical
+import mode_grid
+import mode_weave
+from communication import led
+
 # Communication information
 baudrate = 57600
 port = '/dev/ttyACM0'
 
 # Machine Dimensions in MM
-motorWidth = 696
+motorWidth = 700
 mmPerStep = 0.12525
 topPadding = 400
-leftPadding = 150
+leftPadding = 100
 realWidth = 500
 realHeight = 500
 startingX = 0
 startingY = 0
 
 # Max and min pixel sizes in MM
-maxPixelSize = 30
-minPixelSize = 5
+maxPixelSize = 15
+minPixelSize = 0.5
 
 # Max and min time between pictures in seconds
 maxPictureTime = 90
@@ -30,6 +37,38 @@ minPictureTime = 10
 
 # Drawing params in MM
 maxLineDist = 10
+
+# Chunk dimensions for mode usage
+chunksWide = 10
+chunksHigh = 10
+
+###########################################
+# Create each mode
+###########################################
+hoz = mode_horizontal.Mode_Horizontal(
+    'horizontal',
+    [led.LED(dataPin=18)],
+    chunksWide,
+    chunksHigh)
+vert = mode_vertical.Mode_Vertical(
+    'vertical',
+    [led.LED(dataPin=21)],
+    chunksWide,
+    chunksHigh)
+grid = mode_grid.Mode_Grid(
+    'grid',
+    [led.LED(dataPin=23)],
+    chunksWide,
+    chunksHigh)
+weave = mode_weave.Mode_Weave(
+    'weave',
+    [led.LED(dataPin=24)],
+    chunksWide,
+    chunksHigh)
+
+# Add the modes we want to use in order to an array
+# TODO Grid needs to be fixed
+activeModes = [hoz, vert, weave, grid]
 
 # Starting Mode
 startingMode = 0
@@ -39,9 +78,6 @@ startingMode = 0
 #  1 - Random
 modeSwitch = 0
 
-# Chunk dimensions for mode usage
-chunksWide = 10
-chunksHigh = 10
 
 # Pixel Shape
 pixelShape = 0
@@ -52,6 +88,7 @@ pixelWhiteValue = 255
 zigZagsPerPixel = 4
 
 # Min and Max readings
+# Note: A lot of stuff uses these values and some assuem them currently
+# If you must change them, you will need to edit some other values likely
 MIN = 0
 MAX = 11
-

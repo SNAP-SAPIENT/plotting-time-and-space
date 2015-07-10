@@ -31,13 +31,12 @@ class Interface:
     ####################################################
     # Global Static Items
     ####################################################
+    # Note:All sensors currently use the default min and max value of (0-11)
     # Inputs
-    # TODO make all sensors take in the min and max values for constructor
     humidAndTemp = humidity_and_temperature.HumidityAndTemperatureSensor()
-    hum = None  ## TODO create individual humidity and temp classes
-    tmp = None
-    snd = microphone.MicrophoneSensor(addr=0x4A, ch=3)## TODO create base
-    # method that can be called for all classes
+    hum = humidity_and_temperature.HumiditySensor(humidAndTemp)
+    tmp = humidity_and_temperature.TemperatureSensor(humidAndTemp)
+    snd = microphone.MicrophoneSensor(addr=0x4A, ch=3)
     lux = light.LightSensor(addr=0x39, gain=0)
     reset = switch.SwitchSensor(dataPin=26)
 
@@ -82,6 +81,18 @@ class Interface:
     jttrSensor = None
     thrdSensor = None
     cplxSensor = None
+
+    def __init__(self, MIN=0, MAX=11):
+        """
+        Set up the initial system with some default values expected from
+        config
+
+        Keyword Arguments:
+            MIN - The min value a sensor can give
+            MAX - The max value a sensor can give
+        """
+        self.MIN = MIN
+        self.MAX = MAX
 
     def cycleLights(self):
         """
@@ -262,25 +273,54 @@ class Interface:
     ##############################################################
     def getSlop(self):
         """Returns the slop value"""
-        # TODO
+        pot = self.potSlop.getValue()
+        if self.slopSensor is not None:
+            sensor = self.slopSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
 
     def getSpac(self):
         """Returns the spac value"""
-        # TODO
+        pot = self.potSpac.getValue()
+        if self.spacSensor is not None:
+            sensor = self.spacSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
 
     def getSped(self):
         """Returns the sped value"""
-        # TODO
+        pot = self.potSped.getValue()
+        if self.spedSensor is not None:
+            sensor = self.spedSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
 
     def getJttr(self):
         """Returns the jttr value"""
-        # TODO
+        pot = self.potJttr.getValue()
+        if self.jttrSensor is not None:
+            sensor = self.jttrSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
 
     def getThrd(self):
         """Returns the thrd value"""
-        # TODO
+        pot = self.potThrd.getValue()
+        if self.thrdSensor is not None:
+            sensor = self.thrdSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
 
     def getCplx(self):
         """Returns the cplx value"""
-        # TODO
-
+        pot = self.potCplx.getValue()
+        if self.cplxSensor is not None:
+            sensor = self.cplxSensor.getValue()
+            return max(self.MIN, min(self.MAX, pot*sensor))
+        else:
+            return max(self.MIN, min(self.MAX, pot))
